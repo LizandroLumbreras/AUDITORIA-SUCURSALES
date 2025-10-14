@@ -1,0 +1,344 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Auditoría de Sucursales — PROVSOFT</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root{--azul:#00416A;--resalte:#0c6cbd;--card:#ffffffcc;--radius:12px}
+    *{box-sizing:border-box}
+    body{font-family:'Poppins',sans-serif;margin:0;background:linear-gradient(90deg,#f4f7fa,#fff);color:#111;padding:18px}
+    header{display:flex;align-items:center;gap:12px}
+    header img{height:56px}
+    .wrap{max-width:1100px;margin:18px auto}
+    .card{background:var(--card);border-radius:var(--radius);padding:14px;box-shadow:0 6px 18px rgba(0,0,0,.06);margin-bottom:14px}
+    .grid{display:grid;grid-template-columns:1fr 360px;gap:14px}
+    label{display:block;font-size:13px;color:#333;margin-bottom:6px}
+    input,select,textarea,button{width:100%;padding:10px;border-radius:8px;border:1px solid #ddd}
+    .toolbar{display:flex;gap:8px}
+    .small{font-size:13px;padding:8px}
+    .list{max-height:420px;overflow:auto}
+    .item{display:flex;gap:8px;align-items:center;padding:8px;border-bottom:1px solid #eee}
+    .item img{height:64px;width:64px;object-fit:cover;border-radius:6px;border:1px solid #ddd}
+    .muted{color:#666;font-size:13px}
+    .watermark{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);opacity:.06;font-size:120px;color:#00416A;pointer-events:none;user-select:none}
+    @media(max-width:900px){.grid{grid-template-columns:1fr;}.watermark{font-size:72px}}
+  </style>
+</head>
+<body>
+  <div class="watermark">PROVSOFT</div>
+  <div class="wrap">
+    <header>
+      <img src="logo.png" alt="logo" onerror="this.style.display='none'">
+      <div>
+        <h2 style="margin:0;color:var(--azul)">Auditoría de Sucursales</h2>
+        <div class="muted">Toma fotos, revisa existencias y genera reportes PDF</div>
+      </div>
+    </header>
+
+    <div class="grid">
+      <div>
+        <div class="card">
+          <label>Sucursal</label>
+          <select id="sucursal"></select>
+
+          <label style="margin-top:10px">Encargado / Auditor</label>
+          <input id="auditor" placeholder="Nombre del auditor" />
+
+          <label style="margin-top:10px">Fecha</label>
+          <input id="fecha" type="date" />
+
+          <div style="margin-top:10px" class="toolbar">
+            <button id="nuevaVisita" class="small">Nueva visita</button>
+            <button id="guardarVisita" class="small">Guardar</button>
+            <button id="generarPDF" class="small">Generar PDF</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <label>Buscar producto por código o descripción</label>
+          <div style="display:flex;gap:8px;align-items:center">
+            <input id="buscador" placeholder="Código o descripción" />
+            <button id="buscarCamara" class="small" title="Buscar por cámara" style="width:44px;padding:8px">📷</button>
+            <input id="scanFile" type="file" accept="image/*" capture="environment" style="display:none" />
+          </div>
+
+          <div style="display:flex;gap:8px;margin-top:8px">
+            <input id="cantidad" type="number" step="0.001" min="0" placeholder="Cantidad" />
+            <button id="agregarProd" class="small">Agregar</button>
+          </div>
+
+          <div style="margin-top:12px">
+            <label>Lista de artículos revisados</label>
+            <div id="lista" class="list"></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <label>Notas generales</label>
+          <textarea id="notas" rows="4" placeholder="Observaciones, humedad, falta de iluminación, etc."></textarea>
+        </div>
+      </div>
+
+      <div>
+        <div class="card">
+          <label>Capturar evidencia (foto)</label>
+          <video id="preview" autoplay playsinline style="width:100%;border-radius:8px;display:none"></video>
+          <img id="thumb" style="width:100%;border-radius:8px;display:none" />
+          <div style="display:flex;gap:8px;margin-top:8px">
+            <button id="abrirCamara" class="small">Abrir Cámara</button>
+            <input id="filePhoto" type="file" accept="image/*" capture="environment" style="display:none" />
+            <button id="subirDesdeArchivo" class="small">Desde archivo</button>
+            <button id="capturar" class="small">Capturar</button>
+          </div>
+          <div style="margin-top:10px">
+            <label>Fotos guardadas</label>
+            <div id="photos" class="list"></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <label>Resumen</label>
+          <div id="resumen" class="muted">No hay visitas guardadas.</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Librerías útiles -->
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js"></script>
+
+  <script>
+    // ====== CONFIGURAR ======
+    // Reemplaza con tu firebaseConfig real
+    const firebaseConfig = {
+      apiKey: "REEMPLAZAR",
+      authDomain: "REEMPLAZAR",
+      projectId: "REEMPLAZAR",
+      storageBucket: "REEMPLAZAR",
+      messagingSenderId: "REEMPLAZAR",
+      appId: "REEMPLAZAR"
+    };
+
+    // Inicializar Firebase
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    const storage = firebase.storage();
+
+    // Elementos DOM
+    const sucursalEl = document.getElementById('sucursal');
+    const auditorEl = document.getElementById('auditor');
+    const fechaEl = document.getElementById('fecha');
+    const buscador = document.getElementById('buscador');
+    const cantidadEl = document.getElementById('cantidad');
+    const agregarBtn = document.getElementById('agregarProd');
+    const listaEl = document.getElementById('lista');
+    const notasEl = document.getElementById('notas');
+    const resumenEl = document.getElementById('resumen');
+    const nuevaVisitaBtn = document.getElementById('nuevaVisita');
+    const guardarVisitaBtn = document.getElementById('guardarVisita');
+    const generarPDFBtn = document.getElementById('generarPDF');
+
+    // Fotos
+    const abrirCamaraBtn = document.getElementById('abrirCamara');
+    const filePhoto = document.getElementById('filePhoto');
+    const subirDesdeArchivo = document.getElementById('subirDesdeArchivo');
+    const capturarBtn = document.getElementById('capturar');
+    const preview = document.getElementById('preview');
+    const thumb = document.getElementById('thumb');
+    const photosEl = document.getElementById('photos');
+
+    let currentItems = [];
+    let currentPhotos = [];
+    let stream;
+
+    // Fecha por defecto a hoy
+    fechaEl.value = new Date().toISOString().slice(0,10);
+
+    // Cargar sucursales ejemplo. Puedes cargar desde Firestore si ya las tienes.
+    const sucursalesEj = ['Allende 1','Allende 2','Montemorelos','Central','Ruta 1'];
+    sucursalesEj.forEach(s=>{const o=document.createElement('option');o.value=s;o.textContent=s;sucursalEl.appendChild(o)})
+
+    // Agregar producto a la lista
+    function renderLista(){
+      listaEl.innerHTML = '';
+      currentItems.forEach((it,idx)=>{
+        const div=document.createElement('div');div.className='item';
+        const info=document.createElement('div');info.style.flex='1';
+        info.innerHTML = `<strong>${it.codigo||'—'}</strong><div class='muted'>${it.descripcion||''}</div><div class='muted'>Cant: ${Number(it.cantidad).toFixed(3)}</div>`;
+        const del=document.createElement('button');del.textContent='Eliminar';del.className='small';del.onclick=()=>{currentItems.splice(idx,1);renderLista()}
+        div.appendChild(info);div.appendChild(del);listaEl.appendChild(div)
+      })
+    }
+
+    agregarBtn.onclick = ()=>{
+      const q = buscador.value.trim();
+      const c = parseFloat(cantidadEl.value)||0;
+      if(!q || c<=0) return alert('Ingresa código/descr y cantidad mayor a 0');
+      const [codigo,descripcion] = q.includes('|') ? q.split('|') : [q,q];
+      currentItems.push({codigo:codigo.trim(),descripcion:descripcion.trim(),cantidad:c});
+      buscador.value='';cantidadEl.value='';renderLista();
+    }
+
+    // Fotos: abrir cámara y capturar
+    abrirCamaraBtn.onclick = async ()=>{
+      if(stream){stream.getTracks().forEach(t=>t.stop());stream=null;preview.style.display='none';capturarBtn.style.display='none';thumb.style.display='none';return}
+      try{
+        stream = await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}});
+        preview.srcObject = stream;preview.style.display='block';capturarBtn.style.display='inline-block';thumb.style.display='none';
+      }catch(e){alert('No se pudo acceder a la cámara. Usa "Desde archivo"')}
+    }
+
+    capturarBtn.onclick = ()=>{
+      if(!stream){alert('Abra la cámara primero');return}
+      const v = preview;
+      const canvas = document.createElement('canvas');canvas.width=v.videoWidth;canvas.height=v.videoHeight;canvas.getContext('2d').drawImage(v,0,0);
+      const data = canvas.toDataURL('image/jpeg',0.85);
+      addPhoto(data);
+    }
+
+    subirDesdeArchivo.onclick = ()=> filePhoto.click();
+    filePhoto.onchange = e => {
+      const f = e.target.files[0];
+      if(!f) return;
+      const reader = new FileReader();
+      reader.onload = ()=> addPhoto(reader.result);
+      reader.readAsDataURL(f);
+    }
+
+    function addPhoto(dataUrl){
+      currentPhotos.push({data:dataUrl,ts:Date.now()});
+      renderPhotos();
+    }
+
+    function renderPhotos(){
+      photosEl.innerHTML='';
+      currentPhotos.forEach((p,idx)=>{
+        const div=document.createElement('div');div.className='item';
+        const img=document.createElement('img');img.src=p.data;div.appendChild(img);
+        const info=document.createElement('div');info.style.flex='1';info.innerHTML=`<div class='muted'>${new Date(p.ts).toLocaleString()}</div>`;
+        const del=document.createElement('button');del.className='small';del.textContent='Eliminar';del.onclick=()=>{currentPhotos.splice(idx,1);renderPhotos()}
+        div.appendChild(info);div.appendChild(del);photosEl.appendChild(div)
+      })
+    }
+
+    // Guardar visita en Firestore y subir fotos a Storage
+    guardarVisitaBtn.onclick = async ()=>{
+      const suc = sucursalEl.value; const auditor = auditorEl.value.trim(); const fecha = fechaEl.value; const notas = notasEl.value.trim();
+      if(!suc || !auditor) return alert('Sucursal y auditor son obligatorios');
+      const visitaRef = db.collection('auditorias').doc();
+      const visitasData = {sucursal:suc,auditor,fecha,notas,items:currentItems,createdAt:firebase.firestore.FieldValue.serverTimestamp()};
+      try{
+        await visitaRef.set(visitasData);
+        // subir fotos
+        for(let i=0;i<currentPhotos.length;i++){
+          const p = currentPhotos[i];
+          const blob = dataURLtoBlob(p.data);
+          const path = `auditorias/${visitaRef.id}/photos/${Date.now()}_${i}.jpg`;
+          const snap = await storage.ref(path).put(blob);
+          const url = await snap.ref.getDownloadURL();
+          await visitaRef.collection('photos').add({url,ts:firebase.firestore.FieldValue.serverTimestamp()});
+        }
+        resumenEl.textContent = `Visita guardada: ${visitaRef.id}`;
+        alert('Visita guardada');
+      }catch(e){console.error(e);alert('Error al guardar: '+e.message)}
+    }
+
+    // Generar PDF básico con jsPDF
+    generarPDFBtn.onclick = async ()=>{
+      if(!currentItems.length && !currentPhotos.length) return alert('Nada que exportar');
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF({unit:'pt',format:'a4'});
+      doc.setFont('Poppins');
+      doc.setFontSize(14);doc.text('Auditoría - ' + sucursalEl.value,40,50);
+      doc.setFontSize(10);doc.text('Auditor: '+auditorEl.value,40,70);doc.text('Fecha: '+fechaEl.value,40,86);
+      let y=110;
+      doc.setFontSize(11);doc.text('Items revisados:',40,y); y+=14;
+      currentItems.forEach((it,idx)=>{
+        const line = `${idx+1}. ${it.codigo} - ${it.descripcion}  Cant: ${Number(it.cantidad).toFixed(3)}`;
+        doc.text(line,40,y); y+=12; if(y>740){doc.addPage();y=40}
+      });
+      if(currentPhotos.length){
+        doc.addPage(); y=40; doc.text('Evidencias (fotos):',40,y); y+=12;
+        for(let i=0;i<currentPhotos.length;i++){
+          const imgData = currentPhotos[i].data;
+          try{
+            doc.addImage(imgData,'JPEG',40,y,200,150);
+            y+=160; if(y>720){doc.addPage();y=40}
+          }catch(e){console.warn('Imagen no agregada',e)}
+        }
+      }
+      doc.save(`auditoria_${sucursalEl.value}_${fechaEl.value}.pdf`);
+    }
+
+    function dataURLtoBlob(dataurl){
+      const arr = dataurl.split(','), mime = arr[0].match(/:(.*?);/)[1], bstr = atob(arr[1]);
+      let n = bstr.length; const u8arr = new Uint8Array(n);
+      while(n--) u8arr[n] = bstr.charCodeAt(n);
+      return new Blob([u8arr],{type:mime});
+    }
+
+    // Nueva visita limpia todo
+    nuevaVisitaBtn.onclick = ()=>{currentItems=[];currentPhotos=[];notasEl.value='';auditorEl.value='';renderLista();renderPhotos();resumenEl.textContent='Lista vacía.'}
+
+    // Inicialización: ejemplo carga de productos (en tu caso busca desde Firestore)
+    const productosEj = [{codigo:'001',descripcion:'Cigarro Marca A'}, {codigo:'002',descripcion:'Plato 7x7'}, {codigo:'003',descripcion:'Chile Japonés 250g'}];
+    buscador.addEventListener('input',()=>{
+      const q = buscador.value.toLowerCase();
+      const found = productosEj.find(p=>p.codigo===q || p.descripcion.toLowerCase().includes(q));
+      if(found) buscador.value = `${found.codigo}|${found.descripcion}`;
+    });
+
+    // --- Búsqueda por cámara / escaneo de imagen ---
+    const buscarCamaraBtnEl = document.getElementById('buscarCamara');
+    const scanFile = document.getElementById('scanFile');
+
+    buscarCamaraBtnEl.onclick = async ()=>{
+      // Preferir BarcodeDetector si está disponible
+      if(!('BarcodeDetector' in window)){
+        scanFile.click();
+        return;
+      }
+      try{
+        const streamLocal = await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}});
+        const videoTmp = document.createElement('video'); videoTmp.playsInline = true; videoTmp.autoplay = true; videoTmp.srcObject = streamLocal;
+        await videoTmp.play();
+        const canvas = document.createElement('canvas'); const ctx = canvas.getContext('2d');
+        const detector = new BarcodeDetector({formats: ['ean_13','ean_8','code_128','qr_code','upc_a','upc_e']});
+        let foundCode = null;
+        for(let i=0;i<30 && !foundCode;i++){
+          if(videoTmp.videoWidth===0) await new Promise(r=>setTimeout(r,150));
+          canvas.width = videoTmp.videoWidth || 640; canvas.height = videoTmp.videoHeight || 480;
+          ctx.drawImage(videoTmp,0,0,canvas.width,canvas.height);
+          try{ const results = await detector.detect(canvas); if(results && results.length) foundCode = results[0].rawValue; }catch(e){console.warn('detect error',e)}
+          await new Promise(r=>setTimeout(r,200));
+        }
+        streamLocal.getTracks().forEach(t=>t.stop());
+        if(foundCode){ buscador.value = `${foundCode}|`; buscador.focus(); }
+        else{ alert('No se detectó código. Intenta con "Desde archivo"'); }
+      }catch(e){ console.error(e); alert('Error al acceder a la cámara: '+(e.message||e)); }
+    };
+
+    scanFile.onchange = async e=>{
+      const f = e.target.files[0]; if(!f) return;
+      try{
+        const imgBitmap = await createImageBitmap(f);
+        const canvas = document.createElement('canvas'); canvas.width = imgBitmap.width; canvas.height = imgBitmap.height; const ctx = canvas.getContext('2d'); ctx.drawImage(imgBitmap,0,0);
+        if(!('BarcodeDetector' in window)) return alert('BarcodeDetector no disponible en este navegador');
+        const detector = new BarcodeDetector({formats: ['ean_13','ean_8','code_128','qr_code','upc_a','upc_e']});
+        const results = await detector.detect(canvas);
+        if(results && results.length){ buscador.value = `${results[0].rawValue}|`; buscador.focus(); }
+        else alert('No se detectó código en la imagen');
+      }catch(err){ console.error(err); alert('Error al procesar la imagen'); }
+    };
+
+    // Nota final: adapta las rutas de Firestore y Storage a tu estructura.
+    
+  </script>
+</body>
+</html>
