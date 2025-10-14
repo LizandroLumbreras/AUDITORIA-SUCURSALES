@@ -160,9 +160,29 @@
     // Fecha por defecto a hoy
     fechaEl.value = new Date().toISOString().slice(0,10);
 
-    // Cargar sucursales ejemplo. Puedes cargar desde Firestore si ya las tienes.
-    const sucursalesEj = ['Allende 1','Allende 2','Montemorelos','Central','Ruta 1'];
-    sucursalesEj.forEach(s=>{const o=document.createElement('option');o.value=s;o.textContent=s;sucursalEl.appendChild(o)})
+  // Cargar sucursales desde Firestore. Si no hay documentos usa lista de respaldo
+async function loadSucursales(){
+  try{
+    const snap = await db.collection('almacenes').get();
+    if(!snap.empty){
+      snap.forEach(doc => {
+        const o = document.createElement('option');
+        o.value = doc.id; // guardamos el id del documento
+        const data = doc.data();
+        o.textContent = data && data.nombre ? data.nombre : doc.id;
+        sucursalEl.appendChild(o);
+      });
+    } else {
+      const fallback = ['Allende 1','Allende 2','Montemorelos','Rio Verde','Central','Provileon','Osito'];
+      fallback.forEach(s=>{const o=document.createElement('option');o.value=s;o.textContent=s;sucursalEl.appendChild(o)});
+    }
+  }catch(err){
+    console.warn('No se pudieron cargar sucursales desde Firestore',err);
+    const fallback = ['Allende 1','Allende 2','Montemorelos','Rio Verde','Central','Provileon','Osito'];
+    fallback.forEach(s=>{const o=document.createElement('option');o.value=s;o.textContent=s;sucursalEl.appendChild(o)});
+  }
+}
+loadSucursales();
 
     // Agregar producto a la lista
     function renderLista(){
@@ -227,27 +247,39 @@
       })
     }
 
-    // Guardar visita en Firestore y subir fotos a Storage
-    guardarVisitaBtn.onclick = async ()=>{
-      const suc = sucursalEl.value; const auditor = auditorEl.value.trim(); const fecha = fechaEl.value; const notas = notasEl.value.trim();
-      if(!suc || !auditor) return alert('Sucursal y auditor son obligatorios');
-      const visitaRef = db.collection('auditorias').doc();
-      const visitasData = {sucursal:suc,auditor,fecha,notas,items:currentItems,createdAt:firebase.firestore.FieldValue.serverTimestamp()};
-      try{
-        await visitaRef.set(visitasData);
-        // subir fotos
-        for(let i=0;i<currentPhotos.length;i++){
-          const p = currentPhotos[i];
-          const blob = dataURLtoBlob(p.data);
-          const path = `auditorias/${visitaRef.id}/photos/${Date.now()}_${i}.jpg`;
-          const snap = await storage.ref(path).put(blob);
-          const url = await snap.ref.getDownloadURL();
-          await visitaRef.collection('photos').add({url,ts:firebase.firestore.FieldValue.serverTimestamp()});
-        }
-        resumenEl.textContent = `Visita guardada: ${visitaRef.id}`;
-        alert('Visita guardada');
-      }catch(e){console.error(e);alert('Error al guardar: '+e.message)}
+// Guardar visita en Firestore y subir fotos a Storage (subcolección de la sucursal)
+guardarVisitaBtn.onclick = async ()=>{
+  const sucId = sucursalEl.value;
+  const auditor = auditorEl.value.trim();
+  const fecha = fechaEl.value;
+  const notas = notasEl.value.trim();
+  if(!sucId || !auditor) return alert('Sucursal y auditor son obligatorios');
+  try{
+    const visitaRef = db.collection('almacenes').doc(sucId).collection('auditorias').doc();
+    const visitasData = {
+      sucursalId: sucId,
+      auditor,
+      fecha,
+      notas,
+      items: currentItems,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    };
+    await visitaRef.set(visitasData);
+    for(let i=0;i<currentPhotos.length;i++){
+      const p = currentPhotos[i];
+      const blob = dataURLtoBlob(p.data);
+      const path = `almacenes/${sucId}/auditorias/${visitaRef.id}/photos/${Date.now()}_${i}.jpg`;
+      const snap = await storage.ref(path).put(blob);
+      const url = await snap.ref.getDownloadURL();
+      await visitaRef.collection('photos').add({url,ts:firebase.firestore.FieldValue.serverTimestamp()});
     }
+    resumenEl.textContent = `Visita guardada: ${visitaRef.id} (${sucId})`;
+    alert('Visita guardada');
+  }catch(e){
+    console.error(e);
+    alert('Error al guardar: '+(e.message||e));
+  }
+}
 
     // Generar PDF básico con jsPDF
     generarPDFBtn.onclick = async ()=>{
