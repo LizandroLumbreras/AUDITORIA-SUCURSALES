@@ -43,9 +43,7 @@ input,select,textarea,button{width:100%;padding:10px;border-radius:8px;border:1p
 
 <div class="grid">
 
-<!-- ===================================== -->
-<!-- ============ COLUMNA IZQUIERDA ======= -->
-<!-- ===================================== -->
+<!-- ===================== COLUMNA IZQUIERDA ===================== -->
 <div>
 
   <div class="card">
@@ -74,11 +72,10 @@ input,select,textarea,button{width:100%;padding:10px;border-radius:8px;border:1p
   </div>
 
   <div class="card">
-
     <label>Buscar producto por código o descripción</label>
     <div style="display:flex;gap:8px;align-items:center">
       <input id="buscador" placeholder="Código o descripción" />
-      <button id="buscarCamara" class="small" title="Buscar por cámara" style="width:44px;padding:8px">📷</button>
+      <button id="buscarCamara" class="small" style="width:44px">📷</button>
       <input id="scanFile" type="file" accept="image/*" capture="environment" style="display:none" />
     </div>
 
@@ -95,23 +92,17 @@ input,select,textarea,button{width:100%;padding:10px;border-radius:8px;border:1p
 
   <div class="card">
     <label>Notas generales</label>
-    <textarea id="notas" rows="4" placeholder="Observaciones, humedad, falta de iluminación, etc."></textarea>
+    <textarea id="notas" rows="4"></textarea>
   </div>
 
 </div>
 
-
-
-
-<!-- ===================================== -->
-<!-- ============ COLUMNA DERECHA ========= -->
-<!-- ===================================== -->
+<!-- ===================== COLUMNA DERECHA ===================== -->
 <div>
 
   <div class="card">
     <label>Capturar evidencia (foto)</label>
     <video id="preview" autoplay playsinline style="width:100%;border-radius:8px;display:none"></video>
-    <img id="thumb" style="width:100%;border-radius:8px;display:none" />
 
     <div style="display:flex;gap:8px;margin-top:8px">
       <button id="abrirCamara" class="small">Abrir Cámara</button>
@@ -133,22 +124,17 @@ input,select,textarea,button{width:100%;padding:10px;border-radius:8px;border:1p
 
 </div>
 
-</div> <!-- FIN GRID -->
+</div> <!-- GRID -->
+</div><!-- WRAP -->
 
-</div><!-- wrap -->
-
-<!-- ================= LIBRERÍAS ================= -->
+<!-- FIREBASE -->
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-storage-compat.js"></script>
 
-
-
 <script>
-/* =====================================================
-   =============== CONFIG FIREBASE =====================
-   ===================================================== */
+/* ====================== FIREBASE ====================== */
 
 const firebaseConfig = {
   apiKey: "AIzaSyCK5nb6u2CGRJ8AB1aPlRn54b97bdeAFeM",
@@ -158,119 +144,81 @@ const firebaseConfig = {
   messagingSenderId: "96242533231",
   appId: "1:96242533231:web:aae75a18fbaf9840529e9a"
 };
-  
+
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 const storage = firebase.storage();
 
-
-
-
-/* =====================================================
-   =============== VARIABLES GLOBALES ==================
-   ===================================================== */
-
-const sucursalEl = document.getElementById('sucursal');
-const auditorEl = document.getElementById('auditor');
-const fechaEl = document.getElementById('fecha');
-const buscador = document.getElementById('buscador');
-const cantidadEl = document.getElementById('cantidad');
-const agregarBtn = document.getElementById('agregarProd');
-const listaEl = document.getElementById('lista');
-const notasEl = document.getElementById('notas');
-const resumenEl = document.getElementById('resumen');
-
-const abrirCamaraBtn = document.getElementById('abrirCamara');
-const capturarBtn = document.getElementById('capturar');
-const subirDesdeArchivo = document.getElementById('subirDesdeArchivo');
-const filePhoto = document.getElementById('filePhoto');
-const preview = document.getElementById('preview');
-const thumb = document.getElementById('thumb');
-const photosEl = document.getElementById('photos');
-
+/* ================= VARIABLES ================= */
 let currentItems = [];
 let currentPhotos = [];
 let stream = null;
 
-/* Fecha actual */
-fechaEl.value = new Date().toISOString().slice(0,10);
+const buscador = document.getElementById("buscador");
+const cantidadEl = document.getElementById("cantidad");
 
+/* Fecha por defecto */
+document.getElementById("fecha").value = new Date().toISOString().slice(0,10);
 
-
-
-/* =====================================================
-   =============== CARGA DE PRODUCTOS ==================
-   ===================================================== */
+/* ================= CARGA DE PRODUCTOS ================= */
 
 let productos = [];
 
 async function loadProductos(){
-  try{
-    const snap = await db.collection("productos")
-      .where("activo","==",true)
-      .get();
+  const snap = await db.collection("productos")
+                       .where("activo","==",true)
+                       .get();
 
-    productos = [];
+  productos = snap.docs.map(doc=>{
+    const d = doc.data();
+    return {
+      codigo: String(d.codigoBarra || doc.id).trim(),
+      descripcion: d.concepto || "",
+      equivalentes: Array.isArray(d.codigosEquivalentes)
+                    ? d.codigosEquivalentes.map(x => String(x).trim())
+                    : []
+    };
+  });
 
-    snap.forEach(doc=>{
-      const d = doc.data();
-      productos.push({
-        codigo: d.codigoBarra || doc.id,
-        descripcion: d.concepto || "",
-        equivalentes: d.codigosEquivalentes || [],
-      });
-    });
-
-    console.log("Productos cargados:", productos.length);
-
-  }catch(e){
-    console.error("Error cargando productos:", e);
-  }
+  console.log("Productos cargados:", productos.length);
 }
-
 loadProductos();
 
-
-
-
-/* =====================================================
-   =========== BUSCADOR INTELIGENTE ====================
-   ===================================================== */
+/* ================= BUSCADOR AVANZADO ================= */
 
 buscador.addEventListener("input", ()=>{
-  const q = buscador.value.toLowerCase();
+  const q = buscador.value.toLowerCase().trim();
   if(!q) return;
 
-  const found = productos.find(p =>
-    p.codigo.toLowerCase() === q ||
-    p.descripcion.toLowerCase().includes(q) ||
-    p.equivalentes.some(eq => eq.toLowerCase() === q)
-  );
+  // Autocompletar SOLO si es un código completo
+  if(q.length >= 8){
+    const found = productos.find(p =>
+      p.codigo.toLowerCase() === q ||
+      p.equivalentes.some(eq => eq.toLowerCase() === q)
+    );
 
-  if(found){
-    buscador.value = `${found.codigo}|${found.descripcion}`;
+    if(found){
+      buscador.value = `${found.codigo}|${found.descripcion}`;
+    }
   }
 });
 
-
-
-
-/* =====================================================
-   =============== LISTA DE ARTÍCULOS ==================
-   ===================================================== */
+/* ================= LISTA ================= */
 
 function renderLista(){
-  listaEl.innerHTML = "";
+  const lista = document.getElementById("lista");
+  lista.innerHTML = "";
+
   currentItems.forEach((it,i)=>{
     const div = document.createElement("div");
     div.className = "item";
 
-    const info = document.createElement("div");
-    info.style.flex = "1";
-    info.innerHTML = `
-      <strong>${it.codigo}</strong>
-      <div class="muted">${it.descripcion}</div>
-      <div class="muted">Cant: ${Number(it.cantidad).toFixed(3)}</div>
+    div.innerHTML = `
+      <div style="flex:1">
+        <strong>${it.codigo}</strong>
+        <div class="muted">${it.descripcion}</div>
+        <div class="muted">Cant: ${it.cantidad}</div>
+      </div>
     `;
 
     const del = document.createElement("button");
@@ -278,18 +226,17 @@ function renderLista(){
     del.textContent = "Eliminar";
     del.onclick = ()=>{ currentItems.splice(i,1); renderLista(); };
 
-    div.appendChild(info);
     div.appendChild(del);
-    listaEl.appendChild(div);
+    lista.appendChild(div);
   });
 }
 
-agregarBtn.onclick = ()=>{
+document.getElementById("agregarProd").onclick = ()=>{
   const q = buscador.value.trim();
   const c = parseFloat(cantidadEl.value) || 0;
-  if(!q || c <= 0) return alert("Ingresa un producto y una cantidad válida");
+  if(!q || c<=0) return alert("Ingresa producto y cantidad válida");
 
-  const [codigo, descripcion] = q.includes("|") ? q.split("|") : [q, q];
+  const [codigo, descripcion] = q.includes("|") ? q.split("|") : [q,q];
 
   currentItems.push({
     codigo: codigo.trim(),
@@ -302,160 +249,129 @@ agregarBtn.onclick = ()=>{
   renderLista();
 };
 
+/* ================= FOTOS ================= */
 
-
-
-/* =====================================================
-   =============== MANEJO DE FOTOS =====================
-   ===================================================== */
-
-abrirCamaraBtn.onclick = async ()=>{
+document.getElementById("abrirCamara").onclick = async()=>{
   if(stream){
     stream.getTracks().forEach(t=>t.stop());
-    stream = null;
-    preview.style.display = "none";
-    capturarBtn.style.display = "none";
+    stream=null;
+    document.getElementById("preview").style.display="none";
     return;
   }
-  try{
-    stream = await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}});
-    preview.srcObject = stream;
-    preview.style.display = "block";
-    capturarBtn.style.display = "inline-block";
-  }catch{
-    alert("No se pudo abrir la cámara");
-  }
+
+  stream = await navigator.mediaDevices.getUserMedia({video:{facingMode:"environment"}});
+  const v = document.getElementById("preview");
+  v.srcObject = stream;
+  v.style.display="block";
 };
 
-capturarBtn.onclick = ()=>{
+document.getElementById("capturar").onclick = ()=>{
   if(!stream) return;
 
-  const v = preview;
+  const v = document.getElementById("preview");
   const canvas = document.createElement("canvas");
   canvas.width = v.videoWidth;
   canvas.height = v.videoHeight;
   canvas.getContext("2d").drawImage(v,0,0);
 
-  const data = canvas.toDataURL("image/jpeg",0.75);
-  addPhoto(data);
+  addPhoto(canvas.toDataURL("image/jpeg",0.75));
 };
 
-subirDesdeArchivo.onclick = ()=> filePhoto.click();
+document.getElementById("subirDesdeArchivo").onclick = ()=> 
+  document.getElementById("filePhoto").click();
 
-filePhoto.onchange = e=>{
+document.getElementById("filePhoto").onchange = e=>{
   const f = e.target.files[0];
   const reader = new FileReader();
   reader.onload = ()=> addPhoto(reader.result);
   reader.readAsDataURL(f);
 };
 
-
 function addPhoto(data){
-  currentPhotos.push({data, ts:Date.now()});
+  currentPhotos.push({data,ts:Date.now()});
   renderPhotos();
 }
 
 function renderPhotos(){
-  photosEl.innerHTML = "";
+  const cont = document.getElementById("photos");
+  cont.innerHTML="";
+
   currentPhotos.forEach((p,i)=>{
-    const div = document.createElement("div");
-    div.className = "item";
+    const div=document.createElement("div");
+    div.className="item";
 
-    const img = document.createElement("img");
-    img.src = p.data;
-    div.appendChild(img);
+    div.innerHTML=`
+      <img src="${p.data}">
+      <div style="flex:1" class="muted">${new Date(p.ts).toLocaleString()}</div>
+    `;
 
-    const info = document.createElement("div");
-    info.style.flex = "1";
-    info.innerHTML = `<div class="muted">${new Date(p.ts).toLocaleString()}</div>`;
+    const del=document.createElement("button");
+    del.className="small";
+    del.textContent="Eliminar";
+    del.onclick=()=>{currentPhotos.splice(i,1);renderPhotos();};
 
-    const del = document.createElement("button");
-    del.className = "small";
-    del.textContent = "Eliminar";
-    del.onclick = ()=>{ currentPhotos.splice(i,1); renderPhotos(); };
-
-    div.appendChild(info);
     div.appendChild(del);
-    photosEl.appendChild(div);
+    cont.appendChild(div);
   });
 }
 
-
-
-
-/* =====================================================
-   ============ GUARDAR VISITA FIRESTORE ===============
-   ===================================================== */
-
-function genId(suc){
-  const f = new Date();
-  return `AUD-${suc}-${f.getFullYear()}${(f.getMonth()+1)}${f.getDate()}-${f.getHours()}${f.getMinutes()}${f.getSeconds()}`;
-}
+/* ================= GUARDAR AUDITORÍA ================= */
 
 function dataURLtoBlob(dataurl){
-  const arr = dataurl.split(','), mime = arr[0].match(/:(.*?);/)[1];
-  const bstr = atob(arr[1]); let n = bstr.length;
-  const u8arr = new Uint8Array(n);
-  while(n--) u8arr[n] = bstr.charCodeAt(n);
-  return new Blob([u8arr],{type:mime});
+  const arr=dataurl.split(','), mime=arr[0].match(/:(.*?);/)[1];
+  const bstr=atob(arr[1]); let n=bstr.length;
+  const u8=new Uint8Array(n);
+  while(n--)u8[n]=bstr.charCodeAt(n);
+  return new Blob([u8],{type:mime});
 }
 
-guardarVisita.onclick = async()=>{
+function genId(suc){
+  const f=new Date();
+  return `AUD-${suc}-${f.getFullYear()}${f.getMonth()+1}${f.getDate()}-${f.getHours()}${f.getMinutes()}${f.getSeconds()}`;
+}
 
-  if(!auditorEl.value.trim()) return alert("Ingresa nombre del auditor");
-  if(currentItems.length === 0) return alert("Agrega artículos revisados");
+document.getElementById("guardarVisita").onclick = async()=>{
 
-  const suc = sucursalEl.value;
-  const idVisita = genId(suc);
+  const auditor=document.getElementById("auditor").value.trim();
+  if(!auditor) return alert("Ingresa auditor");
+  if(currentItems.length === 0) return alert("Agrega artículos");
 
-  try{
-    // Crear documento de visita
-    const refVisita = db.collection("auditorias")
-                        .doc(suc)
-                        .collection("registros")
-                        .doc(idVisita);
+  const suc=document.getElementById("sucursal").value;
+  const id=genId(suc);
 
-    await refVisita.set({
-      sucursal: suc,
-      auditor: auditorEl.value.trim(),
-      fecha: fechaEl.value,
-      notas: notasEl.value.trim(),
-      items: currentItems,
-      createdAt: firebase.firestore.FieldValue.serverTimestamp()
-    });
+  const ref=db.collection("auditorias")
+              .doc(suc)
+              .collection("registros")
+              .doc(id);
 
-    // Subir fotos
-    for(let i=0;i<currentPhotos.length;i++){
-      const p=currentPhotos[i];
-      const blob=dataURLtoBlob(p.data);
-      const filePath=`auditorias/${suc}/${idVisita}/photos/${Date.now()}_${i}.jpg`;
-      const snap=await storage.ref(filePath).put(blob);
-      const url=await snap.ref.getDownloadURL();
-      await refVisita.collection("photos").add({
-        url,
-        ts: firebase.firestore.FieldValue.serverTimestamp()
-      });
-    }
+  await ref.set({
+    sucursal:suc,
+    auditor,
+    fecha:document.getElementById("fecha").value,
+    notas:document.getElementById("notas").value.trim(),
+    items:currentItems,
+    createdAt:firebase.firestore.FieldValue.serverTimestamp()
+  });
 
-    resumenEl.textContent = `Visita guardada (${idVisita})`;
-    alert("Auditoría guardada con éxito");
+  // fotos
+  for(let i=0;i<currentPhotos.length;i++){
+    const blob=dataURLtoBlob(currentPhotos[i].data);
+    const filePath=`auditorias/${suc}/${id}/photos/${Date.now()}_${i}.jpg`;
 
-  }catch(e){
-    console.error(e);
-    alert("Error guardando auditoría");
+    const snap=await storage.ref(filePath).put(blob);
+    const url=await snap.ref.getDownloadURL();
+
+    await ref.collection("photos").add({url, ts:Date.now()});
   }
 
+  document.getElementById("resumen").textContent = `Guardado: ${id}`;
+  alert("Auditoría guardada");
 };
 
+/* ================= PDF ================= */
 
-
-
-/* =====================================================
-   ============= GENERAR PDF PROFESIONAL ===============
-   ===================================================== */
-
-generarPDF.onclick = ()=>{
-  if(currentItems.length === 0 && currentPhotos.length === 0)
+document.getElementById("generarPDF").onclick = ()=>{
+  if(currentItems.length===0 && currentPhotos.length===0)
     return alert("Nada que exportar");
 
   const { jsPDF } = window.jspdf;
@@ -463,170 +379,53 @@ generarPDF.onclick = ()=>{
 
   pdf.setFont("Helvetica");
   pdf.setFontSize(18);
-  pdf.setTextColor("#00416A");
-  pdf.text(`Auditoría – ${sucursalEl.value}`, 40, 50);
+  pdf.text("Auditoría",40,50);
 
   pdf.setFontSize(12);
-  pdf.setTextColor("#000");
-  pdf.text(`Auditor: ${auditorEl.value}`, 40, 80);
-  pdf.text(`Fecha: ${fechaEl.value}`, 40, 100);
+  pdf.text(`Sucursal: ${document.getElementById("sucursal").value}`,40,80);
+  pdf.text(`Auditor: ${document.getElementById("auditor").value}`,40,100);
+  pdf.text(`Fecha: ${document.getElementById("fecha").value}`,40,120);
 
-  let y = 130;
+  let y=150;
   pdf.setFontSize(14);
-  pdf.text("Artículos Revisados",40,y); y+=20;
+  pdf.text("Productos:",40,y); y+=20;
 
   pdf.setFontSize(11);
-  currentItems.forEach((it,idx)=>{
-    pdf.text(`${idx+1}. ${it.codigo} – ${it.descripcion}  Cant: ${it.cantidad}`,40,y);
+  currentItems.forEach((it,i)=>{
+    pdf.text(`${i+1}. ${it.codigo} – ${it.descripcion}  Cant: ${it.cantidad}`,40,y);
     y+=14;
-    if(y > 750){ pdf.addPage(); y=40; }
+    if(y>740){pdf.addPage();y=40;}
   });
 
   if(currentPhotos.length){
-    pdf.addPage(); y=40;
+    pdf.addPage();y=40;
     pdf.setFontSize(14);
-    pdf.text("Evidencias Fotográficas",40,y); y+=20;
+    pdf.text("Fotos:",40,y); y+=20;
 
-    for(let p of currentPhotos){
+    currentPhotos.forEach(p=>{
       try{
         pdf.addImage(p.data,"JPEG",40,y,220,150);
-        y+=170;
-        if(y>720){ pdf.addPage(); y=40; }
       }catch{}
-    }
+      y+=170;
+      if(y>720){pdf.addPage();y=40;}
+    });
   }
 
-  pdf.save(`auditoria_${sucursalEl.value}_${fechaEl.value}.pdf`);
+  pdf.save("auditoria.pdf");
 };
 
+/* ================= NUEVA VISITA ================= */
 
-
-
-/* =====================================================
-   =============== NUEVA VISITA ========================
-   ===================================================== */
-
-nuevaVisita.onclick = ()=>{
-  currentItems = [];
-  currentPhotos = [];
-  notasEl.value = "";
-  auditorEl.value = "";
+document.getElementById("nuevaVisita").onclick=()=>{
+  currentItems=[];
+  currentPhotos=[];
   renderLista();
   renderPhotos();
-  resumenEl.textContent = "Lista vacía.";
-};
-
-
-
-
-/* =====================================================
-   ============ ESCÁNER POR CÁMARA =====================
-   ===================================================== */
-
-const buscarCamara = document.getElementById("buscarCamara");
-const scanFile = document.getElementById("scanFile");
-
-buscarCamara.onclick = async()=>{
-
-  if(!("BarcodeDetector" in window)){
-    scanFile.click();
-    return;
-  }
-
-  try{
-    const streamLocal = await navigator.mediaDevices.getUserMedia({video:{facingMode:"environment"}});
-    const videoTmp = document.createElement("video");
-    videoTmp.srcObject = streamLocal;
-    videoTmp.autoplay = true;
-    videoTmp.playsInline = true;
-
-    await videoTmp.play();
-
-    const canvas=document.createElement("canvas");
-    const ctx=canvas.getContext("2d");
-    const detector = new BarcodeDetector({
-      formats:["ean_13","ean_8","code_128","qr_code"]
-    });
-
-    let code=null;
-
-    for(let i=0;i<25 && !code;i++){
-      if(videoTmp.videoWidth===0){
-        await new Promise(r=>setTimeout(r,120));
-        continue;
-      }
-      canvas.width=videoTmp.videoWidth;
-      canvas.height=videoTmp.videoHeight;
-      ctx.drawImage(videoTmp,0,0);
-
-      try{
-        const res = await detector.detect(canvas);
-        if(res.length) code=res[0].rawValue;
-      }catch{}
-
-      await new Promise(r=>setTimeout(r,100));
-    }
-
-    streamLocal.getTracks().forEach(t=>t.stop());
-
-    if(!code) return alert("No se detectó ningún código");
-
-    const found = productos.find(p =>
-      p.codigo === code ||
-      p.equivalentes.includes(code)
-    );
-
-    if(found){
-      buscador.value = `${found.codigo}|${found.descripcion}`;
-    }else{
-      buscador.value = `${code}|`;
-    }
-
-  }catch(e){
-    alert("Error: "+e.message);
-  }
-};
-
-scanFile.onchange = async e=>{
-  const f = e.target.files[0];
-  if(!f) return;
-
-  try{
-    const imgBitmap = await createImageBitmap(f);
-    const canvas=document.createElement("canvas");
-    canvas.width = imgBitmap.width;
-    canvas.height = imgBitmap.height;
-    canvas.getContext("2d").drawImage(imgBitmap,0,0);
-
-    if(!("BarcodeDetector" in window)){
-      return alert("BarcodeDetector no disponible");
-    }
-
-    const detector = new BarcodeDetector({
-      formats:["ean_13","code_128","upc_a"]
-    });
-
-    const res = await detector.detect(canvas);
-
-    if(!res.length) return alert("No se detectó código");
-
-    const val = res[0].rawValue;
-
-    const found = productos.find(p =>
-      p.codigo === val ||
-      p.equivalentes.includes(val)
-    );
-
-    buscador.value = found
-      ? `${found.codigo}|${found.descripcion}`
-      : `${val}|`;
-
-  }catch(e){
-    alert("Error al procesar imagen");
-  }
+  document.getElementById("notas").value="";
+  document.getElementById("auditor").value="";
+  document.getElementById("resumen").textContent="Lista vacía.";
 };
 
 </script>
-
 </body>
 </html>
