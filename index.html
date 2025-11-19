@@ -127,26 +127,64 @@ input,select,textarea,button{width:100%;padding:10px;border-radius:8px;border:1p
 </div> <!-- GRID -->
 </div><!-- WRAP -->
 
-<!-- FIREBASE -->
+<!-- ================= LIBRERÍAS ================= -->
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-storage-compat.js"></script>
 
 <script>
+/* =====================================================
+   =============== CONFIG FIREBASE =====================
+   ===================================================== */
 
-// ======================= PRODUCTOS =========================
+const firebaseConfig = {
+  apiKey: "AIzaSyCK5nb6u2CGRJ8AB1aPlRn54b97bdeAFeM",
+  authDomain: "inventariopv-643f1.firebaseapp.com",
+  projectId: "inventariopv-643f1",
+  storageBucket: "inventariopv-643f1.firebasestorage.app",
+  messagingSenderId: "96242533231",
+  appId: "1:96242533231:web:aae75a18fbaf9840529e9a"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+const storage = firebase.storage();
+
+</script>
+
+<script>
+/* =====================================================
+   =============== VARIABLES GLOBALES ==================
+   ===================================================== */
+
+const buscador = document.getElementById("buscador");
+const cantidadEl = document.getElementById("cantidad");
+const listaEl = document.getElementById("lista");
+const notasEl = document.getElementById("notas");
+
+let currentItems = [];
+let currentPhotos = [];
+let stream = null;
+
+/* Fecha actual */
+document.getElementById("fecha").value = new Date().toISOString().slice(0,10);
+
+
+/* =====================================================
+   =============== CARGA DE PRODUCTOS ==================
+   ===================================================== */
 
 let productos = [];
 
-// Cargar productos activos desde Firestore
 async function loadProductos(){
-  try {
+  try{
     const snap = await db.collection("productos")
-      .where("activo", "==", true)
+      .where("activo","==",true)
       .get();
 
-    productos = snap.docs.map(doc => {
+    productos = snap.docs.map(doc=>{
       const d = doc.data();
       return {
         codigo: String(d.codigoBarra || doc.id).trim(),
@@ -159,7 +197,7 @@ async function loadProductos(){
 
     console.log("Productos cargados:", productos.length);
 
-  } catch (e) {
+  }catch(e){
     console.error("Error al cargar productos:", e);
   }
 }
@@ -167,63 +205,77 @@ async function loadProductos(){
 loadProductos();
 
 
-// =================== BUSCADOR INTELIGENTE ====================
-// Incluye:
-// ✔ Código exacto
-// ✔ Equivalentes exactos
-// ✔ Descripción parcial
-// ✔ No sobrescribe mientras escribes
-// ✔ Autocompleta solo cuando hay 1 coincidencia clara
+/* =====================================================
+   =============== BUSCADOR PROFESIONAL ================
+   ===================================================== */
 
-buscador.addEventListener("input", () => {
+buscador.addEventListener("input", ()=>{
+
   const texto = buscador.value.trim().toLowerCase();
-  if (!texto) return;
+  if(!texto) return;
 
-  let resultado = [];
-
-  // 1. Coincidencia por código exacto
-  resultado = productos.filter(p =>
+  // 1️⃣ Coincidencia por código exacto
+  const exactos = productos.filter(p =>
     p.codigo.toLowerCase() === texto ||
     p.equivalentes.some(eq => eq.toLowerCase() === texto)
   );
 
-  if (resultado.length === 1) {
-    const p = resultado[0];
+  if(exactos.length === 1){
+    const p = exactos[0];
     buscador.value = `${p.codigo}|${p.descripcion}`;
     return;
   }
 
-
-  // 2. Coincidencia por descripción parcial
+  // 2️⃣ Coincidencia por descripción parcial
   const parciales = productos.filter(p =>
     p.descripcion.toLowerCase().includes(texto)
   );
 
-  // Si solo hay 1 coincidencia por descripción, autocompleta
-  if (parciales.length === 1) {
+  if(parciales.length === 1){
     const p = parciales[0];
     buscador.value = `${p.codigo}|${p.descripcion}`;
     return;
   }
 
-  // Si hay muchas coincidencias, no autocompleta (para no estorbar)
-  // Pero sí puedes verlas en consola si quieres:
   console.log("Coincidencias:", parciales.length);
 });
 
 
-// =================== AGREGAR PRODUCTO ====================
+/* =====================================================
+   =============== LISTA DE ARTÍCULOS ==================
+   ===================================================== */
 
-agregarProd.onclick = () => {
+function renderLista(){
+  listaEl.innerHTML = "";
+  currentItems.forEach((it,i)=>{
+    const div = document.createElement("div");
+    div.className = "item";
+
+    const info = document.createElement("div");
+    info.style.flex = "1";
+    info.innerHTML = `
+      <strong>${it.codigo}</strong>
+      <div class="muted">${it.descripcion}</div>
+      <div class="muted">Cant: ${it.cantidad}</div>
+    `;
+
+    const del = document.createElement("button");
+    del.className = "small";
+    del.textContent = "Eliminar";
+    del.onclick = ()=>{ currentItems.splice(i,1); renderLista(); };
+
+    div.appendChild(info);
+    div.appendChild(del);
+    listaEl.appendChild(div);
+  });
+}
+
+document.getElementById("agregarProd").onclick = ()=>{
   const q = buscador.value.trim();
-  const c = parseFloat(cantidad.value) || 0;
+  const c = parseFloat(cantidadEl.value) || 0;
+  if(!q || c <= 0) return alert("Ingresa un producto y una cantidad válida");
 
-  if (!q || c <= 0)
-    return alert("Ingresa producto y cantidad válida");
-
-  const [codigo, descripcion] = q.includes("|")
-    ? q.split("|")
-    : [q, q];
+  const [codigo, descripcion] = q.includes("|") ? q.split("|") : [q,q];
 
   currentItems.push({
     codigo: codigo.trim(),
@@ -232,10 +284,208 @@ agregarProd.onclick = () => {
   });
 
   buscador.value = "";
-  cantidad.value = "";
+  cantidadEl.value = "";
   renderLista();
 };
 
+
+/* =====================================================
+   =============== MANEJO DE FOTOS =====================
+   ===================================================== */
+
+document.getElementById("abrirCamara").onclick = async ()=>{
+  if(stream){
+    stream.getTracks().forEach(t=>t.stop());
+    stream = null;
+    document.getElementById("preview").style.display = "none";
+    return;
+  }
+  try{
+    stream = await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}});
+    const v = document.getElementById("preview");
+    v.srcObject = stream;
+    v.style.display="block";
+  }catch{
+    alert("No se pudo abrir la cámara");
+  }
+};
+
+document.getElementById("capturar").onclick = ()=>{
+  if(!stream) return;
+
+  const v = document.getElementById("preview");
+  const canvas = document.createElement("canvas");
+  canvas.width = v.videoWidth;
+  canvas.height = v.videoHeight;
+  canvas.getContext("2d").drawImage(v,0,0);
+
+  addPhoto(canvas.toDataURL("image/jpeg",0.75));
+};
+
+document.getElementById("subirDesdeArchivo").onclick = ()=> 
+  document.getElementById("filePhoto").click();
+
+document.getElementById("filePhoto").onchange = e=>{
+  const f = e.target.files[0];
+  const reader = new FileReader();
+  reader.onload = ()=> addPhoto(reader.result);
+  reader.readAsDataURL(f);
+};
+
+function addPhoto(data){
+  currentPhotos.push({data,ts:Date.now()});
+  renderPhotos();
+}
+
+function renderPhotos(){
+  const cont = document.getElementById("photos");
+  cont.innerHTML="";
+
+  currentPhotos.forEach((p,i)=>{
+    const div=document.createElement("div");
+    div.className="item";
+
+    const img=document.createElement("img");
+    img.src=p.data;
+
+    const info=document.createElement("div");
+    info.style.flex="1";
+    info.className="muted";
+    info.textContent=new Date(p.ts).toLocaleString();
+
+    const del=document.createElement("button");
+    del.className="small";
+    del.textContent="Eliminar";
+    del.onclick=()=>{currentPhotos.splice(i,1);renderPhotos();};
+
+    div.appendChild(img);
+    div.appendChild(info);
+    div.appendChild(del);
+    cont.appendChild(div);
+  });
+}
+
+
+/* =====================================================
+   ============ GUARDAR VISITA FIRESTORE ===============
+   ===================================================== */
+
+function dataURLtoBlob(dataurl){
+  const arr=dataurl.split(','), mime=arr[0].match(/:(.*?);/)[1];
+  const bstr=atob(arr[1]); let n=bstr.length;
+  const u8=new Uint8Array(n);
+  while(n--)u8[n]=bstr.charCodeAt(n);
+  return new Blob([u8],{type:mime});
+}
+
+function genId(suc){
+  const f=new Date();
+  return `AUD-${suc}-${f.getFullYear()}${f.getMonth()+1}${f.getDate()}-${f.getHours()}${f.getMinutes()}${f.getSeconds()}`;
+}
+
+document.getElementById("guardarVisita").onclick = async()=>{
+
+  const auditor=document.getElementById("auditor").value.trim();
+  if(!auditor) return alert("Ingresa auditor");
+  if(currentItems.length === 0) return alert("Agrega artículos");
+
+  const suc=document.getElementById("sucursal").value;
+  const id=genId(suc);
+
+  const ref=db.collection("auditorias")
+              .doc(suc)
+              .collection("registros")
+              .doc(id);
+
+  await ref.set({
+    sucursal:suc,
+    auditor,
+    fecha:document.getElementById("fecha").value,
+    notas:document.getElementById("notas").value.trim(),
+    items:currentItems,
+    createdAt:firebase.firestore.FieldValue.serverTimestamp()
+  });
+
+  // fotos
+  for(let i=0;i<currentPhotos.length;i++){
+    const blob=dataURLtoBlob(currentPhotos[i].data);
+    const filePath=`auditorias/${suc}/${id}/photos/${Date.now()}_${i}.jpg`;
+
+    const snap=await storage.ref(filePath).put(blob);
+    const url=await snap.ref.getDownloadURL();
+
+    await ref.collection("photos").add({url, ts:Date.now()});
+  }
+
+  document.getElementById("resumen").textContent = `Guardado: ${id}`;
+  alert("Auditoría guardada");
+};
+
+
+/* =====================================================
+   ============= GENERAR PDF PROFESIONAL ===============
+   ===================================================== */
+
+document.getElementById("generarPDF").onclick = ()=>{
+  if(currentItems.length===0 && currentPhotos.length===0)
+    return alert("Nada que exportar");
+
+  const { jsPDF } = window.jspdf;
+  const pdf = new jsPDF("p","pt","a4");
+
+  pdf.setFont("Helvetica");
+  pdf.setFontSize(18);
+  pdf.text("Auditoría de Sucursal",40,50);
+
+  pdf.setFontSize(12);
+  pdf.text(`Sucursal: ${document.getElementById("sucursal").value}`,40,80);
+  pdf.text(`Auditor: ${document.getElementById("auditor").value}`,40,100);
+  pdf.text(`Fecha: ${document.getElementById("fecha").value}`,40,120);
+
+  let y=150;
+  pdf.setFontSize(14);
+  pdf.text("Productos:",40,y); y+=20;
+
+  pdf.setFontSize(11);
+  currentItems.forEach((it,i)=>{
+    pdf.text(`${i+1}. ${it.codigo} – ${it.descripcion}  Cant: ${it.cantidad}`,40,y);
+    y+=14;
+    if(y>740){pdf.addPage();y=40;}
+  });
+
+  if(currentPhotos.length){
+    pdf.addPage();y=40;
+    pdf.setFontSize(14);
+    pdf.text("Fotos:",40,y); y+=20;
+
+    currentPhotos.forEach(p=>{
+      try{
+        pdf.addImage(p.data,"JPEG",40,y,220,150);
+      }catch{}
+      y+=170;
+      if(y>720){pdf.addPage();y=40;}
+    });
+  }
+
+  pdf.save("auditoria.pdf");
+};
+
+
+/* =====================================================
+   =============== NUEVA VISITA ========================
+   ===================================================== */
+
+document.getElementById("nuevaVisita").onclick=()=>{
+  currentItems=[];
+  currentPhotos=[];
+  notasEl.value="";
+  document.getElementById("auditor").value="";
+  renderLista();
+  renderPhotos();
+  document.getElementById("resumen").textContent="Lista vacía.";
+};
+
 </script>
+
 </body>
 </html>
