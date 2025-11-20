@@ -1,143 +1,362 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
 <title>Auditoría de Sucursales — PROVSOFT</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap">
 
+<!-- =================== ESTILOS ====================== -->
 <style>
-:root{--azul:#00416A;--resalte:#0c6cbd;--card:#ffffffcc;--radius:12px}
-*{box-sizing:border-box}
-body{font-family:'Poppins',sans-serif;margin:0;background:linear-gradient(90deg,#f4f7fa,#fff);color:#111;padding:18px}
-header{display:flex;align-items:center;gap:12px}
-header img{height:56px}
-.wrap{max-width:1100px;margin:18px auto}
-.card{background:var(--card);border-radius:var(--radius);padding:14px;box-shadow:0 6px 18px rgba(0,0,0,.06);margin-bottom:14px}
-.grid{display:grid;grid-template-columns:1fr 360px;gap:14px}
-label{display:block;font-size:13px;color:#333;margin-bottom:6px}
-input,select,textarea,button{width:100%;padding:10px;border-radius:8px;border:1px solid #ddd}
-.toolbar{display:flex;gap:8px}
-.small{font-size:13px;padding:8px}
-.list{max-height:420px;overflow:auto}
-.item{display:flex;gap:8px;align-items:center;padding:8px;border-bottom:1px solid #eee}
-.item img{height:64px;width:64px;object-fit:cover;border-radius:6px;border:1px solid #ddd}
-.muted{color:#666;font-size:13px}
-.watermark{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);opacity:.06;font-size:120px;color:#00416A;pointer-events:none;user-select:none}
-@media(max-width:900px){.grid{grid-template-columns:1fr;}.watermark{font-size:72px}}
+/* (LA SECCIÓN 2 COMPLETA VA AQUÍ – se entrega en el próximo mensaje) */
+  :root{
+  --azul:#00416A;
+  --azul2:#0c6cbd;
+  --gris:#f4f4f4;
+  --card:#ffffff;
+  --radius:12px;
+  --shadow:0 4px 18px rgba(0,0,0,.12);
+}
+
+*{
+  box-sizing:border-box;
+  font-family:'Poppins',sans-serif;
+}
+
+body{
+  margin:0;
+  background:linear-gradient(90deg,#f8f9fa,#fff);
+  padding:15px;
+  color:#222;
+}
+
+.watermark{
+  position:fixed;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
+  font-size:120px;
+  color:var(--azul);
+  opacity:0.04;
+  user-select:none;
+  pointer-events:none;
+}
+
+.header{
+  display:flex;
+  align-items:center;
+  gap:16px;
+  margin-bottom:20px;
+}
+
+.logo{
+  height:64px;
+  width:auto;
+}
+
+.subtitle{
+  margin:0;
+  color:#555;
+  font-size:14px;
+}
+
+.container{
+  max-width:1200px;
+  margin:auto;
+  display:grid;
+  grid-template-columns:1fr;
+  gap:18px;
+}
+
+.card{
+  background:var(--card);
+  padding:18px;
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
+}
+
+h3{
+  margin-top:0;
+  font-size:20px;
+  color:var(--azul);
+}
+
+label{
+  font-size:14px;
+  font-weight:600;
+  margin-top:10px;
+  display:block;
+}
+
+input,select,textarea{
+  width:100%;
+  padding:10px;
+  border-radius:8px;
+  border:1px solid #ccc;
+  margin-top:5px;
+  font-size:14px;
+  background:white;
+}
+
+textarea{
+  resize:vertical;
+}
+
+button{
+  padding:10px 14px;
+  border:none;
+  border-radius:8px;
+  cursor:pointer;
+  font-size:14px;
+  font-weight:600;
+  color:white;
+  background:var(--azul);
+}
+
+button.small{
+  padding:6px 10px;
+  font-size:12px;
+}
+
+button:hover{
+  background:var(--azul2);
+}
+
+button:disabled{
+  background:#999;
+  cursor:not-allowed;
+}
+
+.statusBox{
+  margin-top:12px;
+  padding:10px;
+  background:#e9ecef;
+  border-radius:8px;
+  font-size:14px;
+}
+
+.controlButtons{
+  margin-top:14px;
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+}
+
+.reportButtons{
+  margin-top:10px;
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+}
+
+.productSearch{
+  display:flex;
+  gap:8px;
+}
+
+.list{
+  margin-top:14px;
+  max-height:350px;
+  overflow-y:auto;
+  border:1px solid #ddd;
+  border-radius:8px;
+  background:#fafafa;
+}
+
+.item{
+  padding:10px;
+  display:flex;
+  gap:12px;
+  align-items:center;
+  border-bottom:1px solid #eee;
+}
+
+.item:last-child{
+  border-bottom:none;
+}
+
+.itemInfo{
+  flex:1;
+}
+
+.item strong{
+  font-size:15px;
+}
+
+.muted{
+  color:#666;
+  font-size:13px;
+}
+
+.qtyInput, .ventaInput{
+  width:100px!important;
+  padding:6px!important;
+  font-size:14px!important;
+  margin-left:auto;
+}
+
+.deleteBtn{
+  background:#b80000;
+}
+
+.deleteBtn:hover{
+  background:#ff2222;
+}
+
+.fotoControls{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+}
+
+#previewCam{
+  width:100%;
+  max-height:260px;
+  border-radius:10px;
+  margin-top:10px;
+  background:black;
+}
+
+.fotoMini{
+  width:90px;
+  height:90px;
+  object-fit:cover;
+  border-radius:8px;
+  border:1px solid #bbb;
+}
+
+.historialItem{
+  padding:10px;
+  border-bottom:1px solid #ddd;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.historialItem:last-child{
+  border-bottom:none;
+}
+
+.historialBtns{
+  display:flex;
+  gap:8px;
+}
+
+@media (min-width:900px){
+  .container{
+    grid-template-columns:repeat(2,1fr);
+  }
+}
+
 </style>
+
 </head>
-
 <body>
-<div class="watermark">PROVSOFT</div>
-<div class="wrap">
 
-<header>
-  <img src="logo.png" alt="logo" onerror="this.style.display='none'">
+<div class="watermark">PROVSOFT</div>
+
+<header class="header">
+  <img src="logo_proveedora.webp" class="logo" />
   <div>
-    <h2 style="margin:0;color:var(--azul)">Auditoría de Sucursales</h2>
-    <div class="muted">Toma fotos, revisa existencias y genera reportes PDF</div>
+    <h2>Auditoría de Sucursales</h2>
+    <p class="subtitle">Visita 1 → Visita 2 → Ventas → Diferencias → Reporte final</p>
   </div>
 </header>
 
-<div class="grid">
+<div class="container">
 
-<!-- ===================== COLUMNA IZQUIERDA ===================== -->
-<div>
-
+  <!-- PANEL CONTROL -->
   <div class="card">
+    <h3>Datos de Auditoría</h3>
+
     <label>Sucursal</label>
-    <select id="sucursal">
-      <option value="osito">Osito</option>
-      <option value="provileon">Provileón</option>
-      <option value="rioverde">Río Verde</option>
-      <option value="central">Central</option>
-      <option value="montemorelos">Montemorelos</option>
-      <option value="allende1">Allende 1</option>
-      <option value="allende2">Allende 2</option>
-    </select>
+    <select id="sucursalSelect"></select>
 
-    <label style="margin-top:10px">Encargado / Auditor</label>
-    <input id="auditor" placeholder="Nombre del auditor" />
+    <label>Auditor</label>
+    <input id="auditorInput" placeholder="Nombre del auditor">
 
-    <label style="margin-top:10px">Fecha</label>
-    <input id="fecha" type="date" />
+    <label>Fecha</label>
+    <input type="date" id="fechaInput">
 
-    <div style="margin-top:10px" class="toolbar">
-      <button id="nuevaVisita" class="small">Nueva visita</button>
-      <button id="guardarVisita" class="small">Guardar</button>
-      <button id="generarPDF" class="small">Generar PDF</button>
-    </div>
-  </div>
-
-  <div class="card">
-    <label>Buscar producto por código o descripción</label>
-    <div style="display:flex;gap:8px;align-items:center">
-      <input id="buscador" placeholder="Código o descripción" />
-      <button id="buscarCamara" class="small" style="width:44px">📷</button>
-      <input id="scanFile" type="file" accept="image/*" capture="environment" style="display:none" />
-    </div>
-
-    <div style="display:flex;gap:8px;margin-top:8px">
-      <input id="cantidad" type="number" step="0.001" min="0" placeholder="Cantidad" />
-      <button id="agregarProd" class="small">Agregar</button>
-    </div>
-
-    <div style="margin-top:12px">
-      <label>Lista de artículos revisados</label>
-      <div id="lista" class="list"></div>
-    </div>
-  </div>
-
-  <div class="card">
     <label>Notas generales</label>
-    <textarea id="notas" rows="4"></textarea>
+    <textarea id="notasInput" rows="3"></textarea>
+
+    <div class="statusBox">
+      Estado actual: <span id="estadoActual">---</span>
+    </div>
+
+    <div class="controlButtons">
+      <button id="btnIniciarV1">Guardar Visita 1</button>
+      <button id="btnGuardarV2">Guardar Visita 2</button>
+      <button id="btnGuardarVentas">Guardar Ventas Manuales</button>
+      <button id="btnCerrarAuditoria">Cerrar Auditoría</button>
+    </div>
+
+    <div class="reportButtons">
+      <button id="btnPreReporteV1" class="small">Pre-Reporte V1</button>
+      <button id="btnPreReporteV2" class="small">Pre-Reporte V2</button>
+      <button id="btnReporteFinal" class="small">Reporte Final</button>
+    </div>
+
+  </div>
+
+  <!-- PANEL PRODUCTOS -->
+  <div class="card">
+    <h3>Productos Revisados</h3>
+
+    <div class="productSearch">
+      <input id="buscador" placeholder="Código o descripción...">
+      <button id="btnAgregarProd">Agregar</button>
+    </div>
+
+    <div id="listaProductos" class="list"></div>
+  </div>
+
+  <!-- PANEL VENTAS MANUALES -->
+  <div class="card">
+    <h3>Ventas Manuales</h3>
+    <div id="listaVentas" class="list"></div>
+  </div>
+
+  <!-- PANEL FOTOS -->
+  <div class="card">
+    <h3>Fotos de Auditoría</h3>
+
+    <div class="fotoControls">
+      <button id="abrirCamara">Abrir Cámara</button>
+      <input type="file" id="fileFoto" accept="image/*" capture="environment" style="display:none">
+      <button id="btnSubirFoto">Desde archivo</button>
+      <video id="previewCam" autoplay playsinline style="display:none"></video>
+      <button id="btnCapturarFoto">Capturar</button>
+    </div>
+
+    <div id="listaFotos" class="list"></div>
+  </div>
+
+  <!-- PANEL HISTORIAL -->
+  <div class="card">
+    <h3>Historial de Auditorías</h3>
+    <div id="historialContainer"></div>
   </div>
 
 </div>
 
-<!-- ===================== COLUMNA DERECHA ===================== -->
-<div>
-
-  <div class="card">
-    <label>Capturar evidencia (foto)</label>
-    <video id="preview" autoplay playsinline style="width:100%;border-radius:8px;display:none"></video>
-
-    <div style="display:flex;gap:8px;margin-top:8px">
-      <button id="abrirCamara" class="small">Abrir Cámara</button>
-      <input id="filePhoto" type="file" accept="image/*" capture="environment" style="display:none" />
-      <button id="subirDesdeArchivo" class="small">Desde archivo</button>
-      <button id="capturar" class="small">Capturar</button>
-    </div>
-
-    <div style="margin-top:10px">
-      <label>Fotos guardadas</label>
-      <div id="photos" class="list"></div>
-    </div>
-  </div>
-
-  <div class="card">
-    <label>Resumen</label>
-    <div id="resumen" class="muted">No hay visitas guardadas.</div>
-  </div>
-
-</div>
-
-</div> <!-- GRID -->
-</div><!-- WRAP -->
-
-<!-- ================= LIBRERÍAS ================= -->
-<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
-
+<!-- =================== FIREBASE ====================== -->
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-storage-compat.js"></script>
 
+<!-- =================== PDF ====================== -->
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+
+<!-- =================== SCRIPTS ====================== -->
 <script>
-/* =====================================================
-   =============== CONFIG FIREBASE =====================
-   ===================================================== */
+/* (LA SECCIÓN 3 A LA 10 COMPLETA VA AQUÍ – se entregan en mensajes siguientes) */
+  /* ============================================================
+   ==========  CONFIGURACIÓN FIREBASE (TU PROYECTO) ============
+   ============================================================ */
 
 const firebaseConfig = {
   apiKey: "AIzaSyCK5nb6u2CGRJ8AB1aPlRn54b97bdeAFeM",
@@ -152,31 +371,59 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 const storage = firebase.storage();
 
-</script>
 
-<script>
-/* =====================================================
-   =============== VARIABLES GLOBALES ==================
-   ===================================================== */
+/* ============================================================
+   ==========  VARIABLES GLOBALES  =============================
+   ============================================================ */
 
-const buscador = document.getElementById("buscador");
-const cantidadEl = document.getElementById("cantidad");
-const listaEl = document.getElementById("lista");
-const notasEl = document.getElementById("notas");
+let productos = [];            // productos del sistema
+let itemsV1 = [];              // items visita 1
+let itemsV2 = [];              // items visita 2
+let ventasManual = [];         // ventas capturadas manualmente
 
-let currentItems = [];
-let currentPhotos = [];
-let stream = null;
+let fotosV1 = [];
+let fotosV2 = [];
 
-/* Fecha actual */
-document.getElementById("fecha").value = new Date().toISOString().slice(0,10);
+let estado = "vacia";          // estados: vacia, v1, v2, ventas, cerrada
+let auditoriaID = null;        // ID del documento de auditoría actual
+let sucursalActual = null;
+
+let streamCamara = null;
 
 
-/* =====================================================
-   =============== CARGA DE PRODUCTOS ==================
-   ===================================================== */
+/* ============================================================
+   ==========  CARGA INICIAL DE SUCURSALES  ===================
+   ============================================================ */
 
-let productos = [];
+function loadSucursales(){
+  const sel = document.getElementById("sucursalSelect");
+
+  const listado = [
+    "osito",
+    "provileon",
+    "rioverde",
+    "central",
+    "montemorelos",
+    "allende1",
+    "allende2"
+  ];
+
+  listado.forEach(s => {
+    const op = document.createElement("option");
+    op.value = s;
+    op.textContent = s.toUpperCase();
+    sel.appendChild(op);
+  });
+
+  sel.onchange = ()=> cargarEstadoSucursal();
+}
+
+loadSucursales();
+
+
+/* ============================================================
+   ==========  CARGA DE PRODUCTOS DESDE FIRESTORE  ============
+   ============================================================ */
 
 async function loadProductos(){
   try{
@@ -190,301 +437,1329 @@ async function loadProductos(){
         codigo: String(d.codigoBarra || doc.id).trim(),
         descripcion: (d.concepto || "").trim(),
         equivalentes: Array.isArray(d.codigosEquivalentes)
-          ? d.codigosEquivalentes.map(x => String(x).trim())
+          ? d.codigosEquivalentes.map(x=>String(x).trim())
           : []
       };
     });
 
     console.log("Productos cargados:", productos.length);
 
-  }catch(e){
-    console.error("Error al cargar productos:", e);
+  }catch(err){
+    console.error("Error cargando productos:", err);
   }
 }
 
 loadProductos();
 
 
-/* =====================================================
-   =============== BUSCADOR PROFESIONAL ================
-   ===================================================== */
+/* ============================================================
+   ==========  DETECTAR AUDITORÍA ABIERTA  ====================
+   ============================================================ */
 
-buscador.addEventListener("input", ()=>{
+async function cargarEstadoSucursal(){
+  sucursalActual = document.getElementById("sucursalSelect").value;
 
-  const texto = buscador.value.trim().toLowerCase();
-  if(!texto) return;
+  itemsV1 = [];
+  itemsV2 = [];
+  ventasManual = [];
+  fotosV1 = [];
+  fotosV2 = [];
+  auditoriaID = null;
+  estado = "vacia";
+  document.getElementById("estadoActual").textContent = "vacia";
 
-  // 1️⃣ Coincidencia por código exacto
-  const exactos = productos.filter(p =>
-    p.codigo.toLowerCase() === texto ||
-    p.equivalentes.some(eq => eq.toLowerCase() === texto)
-  );
+  limpiarListasUI();
 
-  if(exactos.length === 1){
-    const p = exactos[0];
-    buscador.value = `${p.codigo}|${p.descripcion}`;
+  const snap = await db.collection("auditorias")
+    .doc(sucursalActual)
+    .collection("registros")
+    .where("estado","!=","cerrada")
+    .limit(1)
+    .get();
+
+  if(snap.empty){
+    console.log("No hay auditoría abierta");
     return;
   }
 
-  // 2️⃣ Coincidencia por descripción parcial
-  const parciales = productos.filter(p =>
-    p.descripcion.toLowerCase().includes(texto)
-  );
+  const doc = snap.docs[0];
+  auditoriaID = doc.id;
+  const data = doc.data();
 
-  if(parciales.length === 1){
-    const p = parciales[0];
-    buscador.value = `${p.codigo}|${p.descripcion}`;
-    return;
+  console.log("Auditoría encontrada:", auditoriaID, data.estado);
+
+  estado = data.estado;
+  document.getElementById("estadoActual").textContent = estado;
+
+  // Cargar Visita 1
+  if(data.visita1 && data.visita1.items){
+    itemsV1 = data.visita1.items;
   }
 
-  console.log("Coincidencias:", parciales.length);
-});
+  // Cargar Visita 2
+  if(data.visita2 && data.visita2.items){
+    itemsV2 = data.visita2.items;
+  }
+
+  // Cargar ventas manuales
+  if(data.ventasManual && data.ventasManual.items){
+    ventasManual = data.ventasManual.items;
+  }
+
+  // Cargar fotos
+  if(data.fotosV1) fotosV1 = data.fotosV1;
+  if(data.fotosV2) fotosV2 = data.fotosV2;
+
+  renderProductos();
+  renderVentas();
+  renderFotos();
+}
 
 
-/* =====================================================
-   =============== LISTA DE ARTÍCULOS ==================
-   ===================================================== */
+/* ============================================================
+   ==========  FUNCIONES DE RENDER BÁSICAS  ===================
+   ============================================================ */
 
-function renderLista(){
-  listaEl.innerHTML = "";
-  currentItems.forEach((it,i)=>{
+function limpiarListasUI(){
+  document.getElementById("listaProductos").innerHTML = "";
+  document.getElementById("listaVentas").innerHTML = "";
+  document.getElementById("listaFotos").innerHTML = "";
+}
+
+function renderProductos(){
+  const cont = document.getElementById("listaProductos");
+  cont.innerHTML = "";
+
+  let arr = [];
+
+  if(estado === "vacia") arr = [];
+  if(estado === "v1") arr = itemsV1;
+  if(estado === "v2") arr = itemsV2.length ? itemsV2 : itemsV1;
+  if(estado === "ventas") arr = itemsV2;
+  if(estado === "cerrada") arr = itemsV2;
+
+  arr.forEach((it,i)=>{
     const div = document.createElement("div");
     div.className = "item";
 
-    const info = document.createElement("div");
-    info.style.flex = "1";
-    info.innerHTML = `
-      <strong>${it.codigo}</strong>
-      <div class="muted">${it.descripcion}</div>
-      <div class="muted">Cant: ${it.cantidad}</div>
+    div.innerHTML = `
+      <div class="itemInfo">
+        <strong>${it.codigo}</strong><br>
+        <span class="muted">${it.descripcion}</span>
+      </div>
     `;
 
-    const del = document.createElement("button");
-    del.className = "small";
-    del.textContent = "Eliminar";
-    del.onclick = ()=>{ currentItems.splice(i,1); renderLista(); };
+    // Inputs por estado
+    if(estado === "vacia" || estado === "v1"){
+      // Capturar visita 1
+      div.innerHTML += `
+        <input type="number" class="qtyInput" value="${it.cantidad||""}" 
+          placeholder="V1" data-i="${i}">
+      `;
+    }
+    else if(estado === "v2"){
+      // Capturar visita 2
+      div.innerHTML += `
+        <input type="number" class="qtyInput" value="${it.cantidad||""}" 
+          placeholder="V2" data-i="${i}">
+      `;
+    }
+    else{
+      // Solo lectura para estados avanzados
+      div.innerHTML += `<span>${it.cantidad}</span>`;
+    }
 
-    div.appendChild(info);
-    div.appendChild(del);
-    listaEl.appendChild(div);
+    // Botón eliminar (solo en V1 y V2)
+    if(estado==="v1" || estado==="v2"){
+      div.innerHTML += `
+        <button class="deleteBtn" data-del="${i}">X</button>
+      `;
+    }
+
+    cont.appendChild(div);
   });
 }
 
-document.getElementById("agregarProd").onclick = ()=>{
-  const q = buscador.value.trim();
-  const c = parseFloat(cantidadEl.value) || 0;
-  if(!q || c <= 0) return alert("Ingresa un producto y una cantidad válida");
+function renderVentas(){
+  const cont = document.getElementById("listaVentas");
+  cont.innerHTML = "";
 
-  const [codigo, descripcion] = q.includes("|") ? q.split("|") : [q,q];
+  if(estado === "vacia" || estado === "v1") return;
 
-  currentItems.push({
-    codigo: codigo.trim(),
-    descripcion: descripcion.trim(),
-    cantidad: c
+  itemsV2.forEach((it,i)=>{
+    const venta = ventasManual.find(v=>v.codigo===it.codigo)?.venta || "";
+
+    const div = document.createElement("div");
+    div.className = "item";
+
+    div.innerHTML = `
+      <div class="itemInfo">
+        <strong>${it.codigo}</strong><br>
+        <span class="muted">${it.descripcion}</span>
+      </div>
+
+      <input type="number" class="ventaInput" 
+        data-i="${i}" 
+        value="${venta}" 
+        placeholder="Venta">
+    `;
+
+    cont.appendChild(div);
   });
-
-  buscador.value = "";
-  cantidadEl.value = "";
-  renderLista();
-};
-
-
-/* =====================================================
-   =============== MANEJO DE FOTOS =====================
-   ===================================================== */
-
-document.getElementById("abrirCamara").onclick = async ()=>{
-  if(stream){
-    stream.getTracks().forEach(t=>t.stop());
-    stream = null;
-    document.getElementById("preview").style.display = "none";
-    return;
-  }
-  try{
-    stream = await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}});
-    const v = document.getElementById("preview");
-    v.srcObject = stream;
-    v.style.display="block";
-  }catch{
-    alert("No se pudo abrir la cámara");
-  }
-};
-
-document.getElementById("capturar").onclick = ()=>{
-  if(!stream) return;
-
-  const v = document.getElementById("preview");
-  const canvas = document.createElement("canvas");
-  canvas.width = v.videoWidth;
-  canvas.height = v.videoHeight;
-  canvas.getContext("2d").drawImage(v,0,0);
-
-  addPhoto(canvas.toDataURL("image/jpeg",0.75));
-};
-
-document.getElementById("subirDesdeArchivo").onclick = ()=> 
-  document.getElementById("filePhoto").click();
-
-document.getElementById("filePhoto").onchange = e=>{
-  const f = e.target.files[0];
-  const reader = new FileReader();
-  reader.onload = ()=> addPhoto(reader.result);
-  reader.readAsDataURL(f);
-};
-
-function addPhoto(data){
-  currentPhotos.push({data,ts:Date.now()});
-  renderPhotos();
 }
 
-function renderPhotos(){
-  const cont = document.getElementById("photos");
-  cont.innerHTML="";
+function renderFotos(){
+  const cont = document.getElementById("listaFotos");
+  cont.innerHTML = "";
 
-  currentPhotos.forEach((p,i)=>{
+  const fotos = estado==="v1" ? fotosV1 : fotosV2;
+
+  fotos.forEach((url,i)=>{
     const div=document.createElement("div");
     div.className="item";
 
     const img=document.createElement("img");
-    img.src=p.data;
-
-    const info=document.createElement("div");
-    info.style.flex="1";
-    info.className="muted";
-    info.textContent=new Date(p.ts).toLocaleString();
+    img.className="fotoMini";
+    img.src=url;
 
     const del=document.createElement("button");
-    del.className="small";
-    del.textContent="Eliminar";
-    del.onclick=()=>{currentPhotos.splice(i,1);renderPhotos();};
+    del.className="deleteBtn small";
+    del.textContent="X";
+    del.onclick=()=> eliminarFoto(i);
 
     div.appendChild(img);
-    div.appendChild(info);
     div.appendChild(del);
+
+    cont.appendChild(div);
+  });
+}
+/* ============================================================
+   ==========  BUSCADOR Y AGREGAR PRODUCTOS  ==================
+   ============================================================ */
+
+document.getElementById("buscador").addEventListener("input", ()=>{
+  const t = document.getElementById("buscador").value.trim().toLowerCase();
+  if(!t) return;
+
+  // 1) Coincidencia exacta por código
+  const exactos = productos.filter(p =>
+    p.codigo.toLowerCase() === t ||
+    p.equivalentes.includes(t)
+  );
+
+  if(exactos.length === 1){
+    const p = exactos[0];
+    document.getElementById("buscador").value = `${p.codigo} | ${p.descripcion}`;
+    return;
+  }
+
+  // 2) Búsqueda parcial por descripción
+  const parciales = productos.filter(p =>
+    p.descripcion.toLowerCase().includes(t)
+  );
+
+  if(parciales.length === 1){
+    const p = parciales[0];
+    document.getElementById("buscador").value = `${p.codigo} | ${p.descripcion}`;
+  }
+});
+
+
+document.getElementById("btnAgregarProd").onclick = ()=>{
+
+  const q = document.getElementById("buscador").value.trim();
+  if(!q) return alert("Ingresa código o descripción");
+
+let codigo = "";
+let descripcion = "";
+
+if (q.includes("|")) {
+    const partes = q.split("|");
+    codigo = (partes[0] || "").trim();
+    descripcion = (partes[1] || "").trim();
+} else {
+    // Si no hay "|", buscar si coincide con productos
+    const encontrado = productos.find(p =>
+        p.codigo.toLowerCase() === q.toLowerCase() ||
+        p.descripcion.toLowerCase().includes(q.toLowerCase()) ||
+        p.equivalentes.includes(q.toLowerCase())
+    );
+
+    if (encontrado) {
+        codigo = encontrado.codigo;
+        descripcion = encontrado.descripcion;
+    } else {
+        // Último recurso: usar el texto como código y descripción
+        codigo = q.trim();
+        descripcion = q.trim();
+    }
+}
+
+  const item = {
+    codigo: codigo.trim(),
+    descripcion: descripcion.trim(),
+    cantidad: 0
+  };
+
+  if(estado === "vacia"){
+    estado = "v1";
+    itemsV1.push(item);
+  }
+  else if(estado === "v1"){
+    itemsV1.push(item);
+  }
+  else if(estado === "v2"){
+    itemsV2.push(item);
+  }
+  else{
+    return alert("No puedes agregar productos en este estado");
+  }
+
+  document.getElementById("buscador").value = "";
+  renderProductos();
+};
+
+
+/* ============================================================
+   ==========  GUARDAR CANTIDADES DESDE INPUTS  ===============
+   ============================================================ */
+
+document.getElementById("listaProductos").addEventListener("input", e=>{
+  if(e.target.classList.contains("qtyInput")){
+    const index = parseInt(e.target.dataset.i);
+    const val = parseFloat(e.target.value) || 0;
+
+    if(estado === "v1" || estado==="vacia"){
+      itemsV1[index].cantidad = val;
+    }
+    else if(estado === "v2"){
+      itemsV2[index].cantidad = val;
+    }
+  }
+});
+
+
+/* ============================================================
+   ==========  ELIMINAR PRODUCTO SEGÚN ESTADO =================
+   ============================================================ */
+
+document.getElementById("listaProductos").addEventListener("click", e=>{
+  if(e.target.dataset.del){
+    const i = parseInt(e.target.dataset.del);
+
+    if(estado === "v1"){
+      itemsV1.splice(i,1);
+      renderProductos();
+    }
+    else if(estado === "v2"){
+      itemsV2.splice(i,1);
+      renderProductos();
+    }
+  }
+});
+
+
+/* ============================================================
+   ==========  GENERAR ID DE AUDITORÍA  =======================
+   ============================================================ */
+
+function genID(){
+  const f = new Date();
+  return `AUD-${sucursalActual}-${f.getFullYear()}${f.getMonth()+1}${f.getDate()}-${f.getHours()}${f.getMinutes()}${f.getSeconds()}`;
+}
+
+
+/* ============================================================
+   ==========  GUARDAR VISITA 1 (PRE–GUARDADO)  ===============
+   ============================================================ */
+
+document.getElementById("btnIniciarV1").onclick = async()=>{
+
+  if(estado !== "v1" && estado !== "vacia"){
+    alert("No puedes guardar visita 1: ya existe progreso");
+    return;
+  }
+
+  const auditor = document.getElementById("auditorInput").value.trim();
+  if(!auditor) return alert("Ingresa nombre del auditor");
+
+  if(itemsV1.length === 0)
+    return alert("Agrega productos para Visita 1");
+
+  const fecha = document.getElementById("fechaInput").value;
+  const notas = document.getElementById("notasInput").value.trim();
+
+  auditoriaID = genID();
+
+  const ref = db.collection("auditorias")
+      .doc(sucursalActual)
+      .collection("registros")
+      .doc(auditoriaID);
+
+  await ref.set({
+    sucursal: sucursalActual,
+    estado: "v1",
+    visita1:{
+      fecha,
+      auditor,
+      notas,
+      items: itemsV1
+    },
+    fotosV1: fotosV1,
+    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+  });
+
+  estado = "v1";
+  document.getElementById("estadoActual").textContent = estado;
+
+  alert("Visita 1 guardada (pre–guardado).");
+
+  cargarEstadoSucursal();
+};
+
+
+/* ============================================================
+   ==========  GUARDAR VISITA 2 (PRE–GUARDADO)  ===============
+   ============================================================ */
+
+document.getElementById("btnGuardarV2").onclick = async()=>{
+
+  if(estado !== "v1" && estado !== "v2"){
+    alert("No puedes guardar visita 2 todavía");
+    return;
+  }
+
+  if(itemsV2.length === 0){
+    // Si no hay itemsV2, se copian los de visita 1
+    itemsV2 = itemsV1.map(x=>({...x}));
+  }
+
+  const auditor = document.getElementById("auditorInput").value.trim();
+  if(!auditor) return alert("Ingresa nombre del auditor");
+
+  const fecha = document.getElementById("fechaInput").value;
+  const notas = document.getElementById("notasInput").value.trim();
+
+  const ref = db.collection("auditorias")
+      .doc(sucursalActual)
+      .collection("registros")
+      .doc(auditoriaID);
+
+  await ref.update({
+    estado: "v2",
+    visita2:{
+      fecha,
+      auditor,
+      notas,
+      items: itemsV2
+    },
+    fotosV2: fotosV2,
+    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+  });
+
+  estado = "v2";
+  document.getElementById("estadoActual").textContent = estado;
+
+  alert("Visita 2 guardada (pre–guardado).");
+
+  renderProductos();
+};
+/* ============================================================
+   ==========  CAPTURAR VENTAS MANUALES DESDE INPUTS  =========
+   ============================================================ */
+
+document.getElementById("listaVentas").addEventListener("input", e=>{
+  if(e.target.classList.contains("ventaInput")){
+    const i = parseInt(e.target.dataset.i);
+    const val = parseFloat(e.target.value) || 0;
+
+    ventasManual[i] = {
+      codigo: itemsV2[i].codigo,
+      descripcion: itemsV2[i].descripcion,
+      venta: val
+    };
+  }
+});
+
+
+/* ============================================================
+   ==========  GUARDAR VENTAS MANUALES ========================
+   ============================================================ */
+
+document.getElementById("btnGuardarVentas").onclick = async()=>{
+
+  if(estado !== "v2" && estado !== "ventas"){
+    alert("Primero debes guardar Visita 2");
+    return;
+  }
+
+  if(ventasManual.length === 0){
+    alert("Ingresa las ventas manuales antes de guardar.");
+    return;
+  }
+
+  const ref = db.collection("auditorias")
+    .doc(sucursalActual)
+    .collection("registros")
+    .doc(auditoriaID);
+
+  await ref.update({
+    estado: "ventas",
+    ventasManual: {
+      items: ventasManual
+    },
+    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+  });
+
+  estado = "ventas";
+  document.getElementById("estadoActual").textContent = "ventas";
+
+  alert("Ventas manuales guardadas correctamente.");
+
+  renderVentas();
+};
+/* ============================================================
+   ==========  CALCULAR DIFERENCIAS FINALES  ===================
+   ============================================================ */
+
+function calcularDiferenciasFinales(){
+  const diffs = [];
+
+  itemsV1.forEach(v1 => {
+    const v2 = itemsV2.find(x => x.codigo === v1.codigo) || { cantidad: 0 };
+    const venta = ventasManual.find(x => x.codigo === v1.codigo)?.venta || 0;
+
+    const esperado = v1.cantidad - venta;
+    const diferencia = v2.cantidad - esperado;
+
+    diffs.push({
+      codigo: v1.codigo,
+      descripcion: v1.descripcion,
+      cantidadV1: v1.cantidad,
+      ventaManual: venta,
+      esperado,
+      cantidadV2: v2.cantidad,
+      diferencia
+    });
+  });
+
+  return diffs;
+}
+
+/* ============================================================
+   ==========  CERRAR AUDITORÍA ===============================
+   ============================================================ */
+
+document.getElementById("btnCerrarAuditoria").onclick = async()=>{
+
+  if(estado !== "ventas"){
+    alert("Debes capturar primero las ventas manuales para cerrar la auditoría.");
+    return;
+  }
+
+  if(ventasManual.length === 0){
+    return alert("Debes capturar ventas manuales para todos los productos.");
+  }
+
+  const diffs = calcularDiferenciasFinales();
+
+  const ref = db.collection("auditorias")
+    .doc(sucursalActual)
+    .collection("registros")
+    .doc(auditoriaID);
+
+  await ref.update({
+    estado: "cerrada",
+    diferencias: diffs,
+    fechaCierre: new Date().toISOString(),
+    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+  });
+
+  estado = "cerrada";
+  document.getElementById("estadoActual").textContent = "cerrada";
+
+  alert("Auditoría cerrada correctamente.");
+
+  renderProductos();
+  renderVentas();
+  renderFotos();
+};
+/* ============================================================
+   ==========  MANEJO DE FOTOS Y CÁMARA ========================
+   ============================================================ */
+
+const btnAbrirCamara = document.getElementById("abrirCamara");
+const btnSubirFoto = document.getElementById("btnSubirFoto");
+const btnCapturarFoto = document.getElementById("btnCapturarFoto");
+const fileFoto = document.getElementById("fileFoto");
+const previewCam = document.getElementById("previewCam");
+
+
+/* ============================================================
+   ==========  ABRIR / CERRAR CÁMARA  ==========================
+   ============================================================ */
+
+btnAbrirCamara.onclick = async ()=>{
+  if(streamCamara){
+    cerrarCamara();
+    return;
+  }
+
+  try{
+    streamCamara = await navigator.mediaDevices.getUserMedia({
+      video:{facingMode: "environment"}
+    });
+
+    previewCam.srcObject = streamCamara;
+    previewCam.style.display = "block";
+
+  }catch(err){
+    alert("No se pudo abrir la cámara");
+  }
+};
+
+function cerrarCamara(){
+  if(streamCamara){
+    streamCamara.getTracks().forEach(t=>t.stop());
+  }
+  streamCamara = null;
+  previewCam.style.display = "none";
+}
+
+
+/* ============================================================
+   ==========  CAPTURAR FOTO DESDE CÁMARA ======================
+   ============================================================ */
+
+btnCapturarFoto.onclick = async ()=>{
+
+  if(!streamCamara){
+    return alert("Primero abre la cámara");
+  }
+
+  const canvas = document.createElement("canvas");
+  canvas.width = previewCam.videoWidth;
+  canvas.height = previewCam.videoHeight;
+  const ctx = canvas.getContext("2d");
+  ctx.drawImage(previewCam, 0, 0);
+
+  const dataUrl = canvas.toDataURL("image/jpeg", 0.85);
+
+  await subirFotoAFirebase(dataUrl);
+};
+
+
+/* ============================================================
+   ==========  SUBIR FOTO DESDE ARCHIVO ========================
+   ============================================================ */
+
+btnSubirFoto.onclick = ()=> fileFoto.click();
+
+fileFoto.onchange = async e=>{
+  const archivo = e.target.files[0];
+  if(!archivo) return;
+
+  const reader = new FileReader();
+  reader.onload = async ()=>{
+    await subirFotoAFirebase(reader.result);
+  };
+  reader.readAsDataURL(archivo);
+};
+
+
+/* ============================================================
+   ==========  CONVERTIR DATAURL A BLOB ========================
+   ============================================================ */
+
+function dataURLtoBlob(dataurl){
+  const arr = dataurl.split(',');
+  const mime = arr[0].match(/:(.*?);/)[1];
+  const bstr = atob(arr[1]);
+  let n = bstr.length;
+  const u8 = new Uint8Array(n);
+  while(n--) u8[n] = bstr.charCodeAt(n);
+  return new Blob([u8], {type:mime});
+}
+
+
+/* ============================================================
+   ==========  SUBIR FOTO A STORAGE ============================
+   ============================================================ */
+
+async function subirFotoAFirebase(dataUrl){
+
+  if(estado==="vacia"){
+    alert("Primero guarda Visita 1 para activar fotos");
+    return;
+  }
+
+  const blob = dataURLtoBlob(dataUrl);
+
+  let carpeta = estado === "v1" ? "V1" : "V2";
+  const filePath = `auditorias/${sucursalActual}/${auditoriaID}/${carpeta}/${Date.now()}.jpg`;
+
+  const uploadTask = await storage.ref(filePath).put(blob);
+  const url = await uploadTask.ref.getDownloadURL();
+
+  if(estado === "v1"){
+    fotosV1.push(url);
+  }else{
+    fotosV2.push(url);
+  }
+
+  // Guardar fotos en Firestore
+  const ref = db.collection("auditorias")
+      .doc(sucursalActual)
+      .collection("registros")
+      .doc(auditoriaID);
+
+  await ref.update({
+    fotosV1: fotosV1,
+    fotosV2: fotosV2
+  });
+
+  renderFotos();
+  alert("Foto guardada.");
+}
+
+
+/* ============================================================
+   ==========  ELIMINAR FOTO DE LISTA ==========================
+   ============================================================ */
+
+async function eliminarFoto(i){
+  const fotos = estado==="v1" ? fotosV1 : fotosV2;
+  const url = fotos[i];
+
+  try{
+    const refFromUrl = storage.refFromURL(url);
+    await refFromUrl.delete();
+  }catch{
+    console.warn("No se pudo borrar archivo de Storage.");
+  }
+
+  fotos.splice(i,1);
+
+  const ref = db.collection("auditorias")
+      .doc(sucursalActual)
+      .collection("registros")
+      .doc(auditoriaID);
+
+  await ref.update({
+    fotosV1,
+    fotosV2
+  });
+
+  renderFotos();
+}
+/* ============================================================
+   ==========  GENERAR PDF – UTILIDADES ========================
+   ============================================================ */
+
+async function cargarLogoBase64(){
+  return new Promise((resolve)=>{
+    const img = new Image();
+    img.src = "logo_proveedora.webp";
+    img.onload = ()=>{
+      const canvas = document.createElement("canvas");
+      canvas.width = img.width;
+      canvas.height = img.height;
+      canvas.getContext("2d").drawImage(img, 0, 0);
+      resolve(canvas.toDataURL("image/webp"));
+    };
+  });
+}
+
+function addTitulo(pdf, titulo){
+  pdf.setFont("Helvetica","bold");
+  pdf.setFontSize(16);
+  pdf.text(titulo, 40, 100);
+  pdf.setFont("Helvetica","normal");
+  pdf.setFontSize(11);
+}
+
+function nuevaPaginaSi(pdf, y){
+  if(y > 760){
+    pdf.addPage();
+    return 60;
+  }
+  return y;
+}
+
+
+/* ============================================================
+   ==========  PDF – PRE REPORTE VISITA 1 ======================
+   ============================================================ */
+
+document.getElementById("btnPreReporteV1").onclick = async ()=>{
+
+  if(estado !== "v1"){
+    return alert("Solo puedes generar pre-reporte de Visita 1 cuando estés en estado V1.");
+  }
+
+  const { jsPDF } = window.jspdf;
+  const pdf = new jsPDF("p","pt","a4");
+
+  const logo = await cargarLogoBase64();
+  pdf.addImage(logo, "WEBP", 40, 20, 140, 60);
+
+  addTitulo(pdf, "PRE-REPORTE – VISITA 1");
+
+  let y = 140;
+
+  pdf.text(`Sucursal: ${sucursalActual}`, 40, y); y+=20;
+  pdf.text(`Auditor: ${document.getElementById("auditorInput").value}`, 40, y); y+=20;
+  pdf.text(`Fecha: ${document.getElementById("fechaInput").value}`, 40, y); y+=20;
+
+  y+=10;
+  pdf.setFont("Helvetica","bold");
+  pdf.text("Productos revisados:", 40, y);
+  pdf.setFont("Helvetica","normal");
+  y+=20;
+
+  itemsV1.forEach((it,i)=>{
+    y = nuevaPaginaSi(pdf, y);
+    pdf.text(`${i+1}. ${it.codigo} – ${it.descripcion}    Cant: ${it.cantidad}`, 40, y);
+    y+=16;
+  });
+
+  if(fotosV1.length){
+    y+=20;
+    pdf.setFont("Helvetica","bold");
+    pdf.text("Fotos:", 40, y);
+    pdf.setFont("Helvetica","normal");
+    y += 20;
+
+    for(let url of fotosV1){
+      const img = new Image();
+      img.src = url;
+      await new Promise(res=> img.onload=res);
+
+      const w = 160, h = 120;
+
+      y = nuevaPaginaSi(pdf, y);
+      pdf.addImage(img, "JPEG", 40, y, w, h);
+      y += h + 20;
+    }
+  }
+
+  pdf.save(`PreReporte_V1_${sucursalActual}.pdf`);
+};
+
+
+/* ============================================================
+   ==========  PDF – PRE REPORTE VISITA 2 ======================
+   ============================================================ */
+
+document.getElementById("btnPreReporteV2").onclick = async ()=>{
+
+  if(estado !== "v2" && estado !== "ventas"){
+    return alert("Solo puedes generar pre-reporte de Visita 2 cuando estés en V2 o ventas.");
+  }
+
+  const { jsPDF } = window.jspdf;
+  const pdf = new jsPDF("p","pt","a4");
+
+  const logo = await cargarLogoBase64();
+  pdf.addImage(logo, "WEBP", 40, 20, 140, 60);
+
+  addTitulo(pdf, "PRE-REPORTE – VISITA 2");
+
+  let y = 140;
+
+  pdf.text(`Sucursal: ${sucursalActual}`, 40, y); y+=20;
+  pdf.text(`Auditor: ${document.getElementById("auditorInput").value}`, 40, y); y+=20;
+  pdf.text(`Fecha: ${document.getElementById("fechaInput").value}`, 40, y); y+=20;
+
+  y+=10;
+  pdf.setFont("Helvetica","bold");
+  pdf.text("Productos revisados:", 40, y);
+  pdf.setFont("Helvetica","normal");
+  y+=20;
+
+  itemsV2.forEach((it,i)=>{
+    y = nuevaPaginaSi(pdf, y);
+    pdf.text(`${i+1}. ${it.codigo} – ${it.descripcion}    Cant V2: ${it.cantidad}`, 40, y);
+    y+=16;
+  });
+
+  if(fotosV2.length){
+    y+=20;
+    pdf.setFont("Helvetica","bold");
+    pdf.text("Fotos:", 40, y);
+    pdf.setFont("Helvetica","normal");
+    y += 20;
+
+    for(let url of fotosV2){
+      const img = new Image();
+      img.src = url;
+      await new Promise(res=> img.onload=res);
+
+      const w = 160, h = 120;
+
+      y = nuevaPaginaSi(pdf, y);
+      pdf.addImage(img, "JPEG", 40, y, w, h);
+      y += h + 20;
+    }
+  }
+
+  pdf.save(`PreReporte_V2_${sucursalActual}.pdf`);
+};
+
+
+/* ============================================================
+   ==========  PDF – REPORTE FINAL COMPLETO ===================
+   ============================================================ */
+
+document.getElementById("btnReporteFinal").onclick = async ()=>{
+
+  if(estado !== "cerrada"){
+    return alert("Aún no puedes generar el reporte final. Primero cierra la auditoría.");
+  }
+
+  const { jsPDF } = window.jspdf;
+  const pdf = new jsPDF("p","pt","a4");
+
+  const logo = await cargarLogoBase64();
+  pdf.addImage(logo, "WEBP", 40, 20, 140, 60);
+
+  addTitulo(pdf, "REPORTE FINAL – AUDITORÍA COMPLETA");
+
+  let y = 140;
+
+  pdf.text(`Sucursal: ${sucursalActual}`, 40, y); y+=20;
+  pdf.text(`Auditor: ${document.getElementById("auditorInput").value}`, 40, y); y+=20;
+  pdf.text(`Fecha final: ${new Date().toLocaleString()}`, 40, y); y+=20;
+
+  y+=20;
+  pdf.setFont("Helvetica","bold");
+  pdf.text("Diferencias finales:", 40, y);
+  pdf.setFont("Helvetica","normal");
+  y+=20;
+
+  const diffs = calcularDiferenciasFinales();
+
+  diffs.forEach((d,i)=>{
+    y = nuevaPaginaSi(pdf, y);
+    pdf.text(
+      `${i+1}. ${d.codigo} – ${d.descripcion}
+       V1: ${d.cantidadV1} | Venta: ${d.ventaManual} | Esperado: ${d.esperado} | V2: ${d.cantidadV2} | Dif: ${d.diferencia}`,
+      40,
+      y
+    );
+    y+=40;
+  });
+
+  y+=20;
+  pdf.setFont("Helvetica","bold");
+  pdf.text("Fotos de Visita 1:", 40, y);
+  pdf.setFont("Helvetica","normal");
+  y+=20;
+
+  for(let url of fotosV1){
+    y = await agregarImagenPDF(pdf, url, y);
+  }
+
+  y+=20;
+  pdf.setFont("Helvetica","bold");
+  pdf.text("Fotos de Visita 2:", 40, y);
+  pdf.setFont("Helvetica","normal");
+  y+=20;
+
+  for(let url of fotosV2){
+    y = await agregarImagenPDF(pdf, url, y);
+  }
+
+  pdf.save(`Reporte_Final_${sucursalActual}.pdf`);
+};
+
+
+async function agregarImagenPDF(pdf, url, y){
+  const img = new Image();
+  img.src = url;
+  await new Promise(res=> img.onload=res);
+
+  const w = 140, h = 110;
+
+  y = nuevaPaginaSi(pdf, y);
+  pdf.addImage(img, "JPEG", 40, y, w, h);
+  return y + h + 20;
+}
+/* ============================================================
+   ==========  COMPARTIR PDF – WHATSAPP / CORREO ===============
+   ============================================================ */
+
+/**
+ * Recibe un objeto jsPDF y lo convierte en un archivo Blob
+ * para compartirlo por WhatsApp, correo o Share API
+ */
+async function compartirPDF(pdf, nombreArchivo) {
+
+  // 1) Convertir PDF a blob
+  const blob = pdf.output("blob");
+  const file = new File([blob], nombreArchivo, { type: "application/pdf" });
+
+  /* ============================================================
+     ==========   SHARE API NATIVA (Android / iPhone)   ==========
+     ============================================================ */
+
+  if (navigator.canShare && navigator.canShare({ files: [file] })) {
+    try {
+      await navigator.share({
+        title: nombreArchivo,
+        text: "Te comparto el reporte de la auditoría.",
+        files: [file]
+      });
+      return;
+    } catch (err) {
+      console.warn("El usuario canceló Share API:", err);
+    }
+  }
+
+  /* ============================================================
+     ==========  WHATSAPP (si Share API no está)  ================
+     ============================================================ */
+
+  try {
+    const urlWhatsapp = `https://wa.me/?text=Te%20envío%20el%20reporte%20de%20auditoría.%20Adjunto:%20${nombreArchivo}`;
+    window.open(urlWhatsapp, "_blank");
+  } catch (e) {
+    console.warn("Error abriendo WhatsApp");
+  }
+
+  /* ============================================================
+     ==========  CORREO ELECTRÓNICO (mailto)  ====================
+     ============================================================ */
+
+  try {
+    const mailto = `mailto:?subject=Reporte de Auditoría&body=Te envío el reporte de auditoría.`;
+    window.location.href = mailto;
+  } catch (e) {
+    console.warn("No se pudo abrir correo");
+  }
+
+  /* ============================================================
+     ==========  FALLBACK FINAL – DESCARGA NORMAL  ===============
+     ============================================================ */
+
+  pdf.save(nombreArchivo);
+}
+
+
+/* ============================================================
+   ==========  BOTONES DE ENVÍO DIRECTO ========================
+   ============================================================ */
+
+document.getElementById("btnPreReporteV1").addEventListener("contextmenu", async (e)=>{
+  e.preventDefault();
+  if(estado !== "v1") return;
+
+  const pdf = await generarPDF_V1(true);
+  compartirPDF(pdf, `PreReporte_V1_${sucursalActual}.pdf`);
+});
+
+document.getElementById("btnPreReporteV2").addEventListener("contextmenu", async (e)=>{
+  e.preventDefault();
+  if(estado !== "v2" && estado!=="ventas") return;
+
+  const pdf = await generarPDF_V2(true);
+  compartirPDF(pdf, `PreReporte_V2_${sucursalActual}.pdf`);
+});
+
+document.getElementById("btnReporteFinal").addEventListener("contextmenu", async (e)=>{
+  e.preventDefault();
+  if(estado !== "cerrada") return;
+
+  const pdf = await generarPDF_Final(true);
+  compartirPDF(pdf, `Reporte_Final_${sucursalActual}.pdf`);
+});
+
+
+/* ============================================================
+   ==========  VERSIÓN COMPARTIBLE DE LOS PDF ==================
+   ============================================================ */
+
+// Esta función reconstruye el PDF pero devolviéndolo como objeto,
+// sin hacer pdf.save(), para poderlo enviar por WhatsApp/correo
+
+async function generarPDF_V1(soloObj=false){
+  const { jsPDF } = window.jspdf;
+  const pdf = new jsPDF("p","pt","a4");
+
+  const logo = await cargarLogoBase64();
+  pdf.addImage(logo, "WEBP", 40, 20, 140, 60);
+  addTitulo(pdf, "PRE-REPORTE – VISITA 1");
+
+  let y = 140;
+  pdf.text(`Sucursal: ${sucursalActual}`, 40, y); y+=20;
+  pdf.text(`Auditor: ${document.getElementById("auditorInput").value}`, 40, y); y+=20;
+  pdf.text(`Fecha: ${document.getElementById("fechaInput").value}`, 40, y); y+=20;
+
+  y+=20;
+  pdf.setFont("Helvetica","bold");
+  pdf.text("Productos revisados:", 40, y);
+  pdf.setFont("Helvetica","normal");
+  y+=20;
+
+  itemsV1.forEach((it,i)=>{
+    y = nuevaPaginaSi(pdf, y);
+    pdf.text(`${i+1}. ${it.codigo} – ${it.descripcion} | Cant: ${it.cantidad}`, 40, y);
+    y+=16;
+  });
+
+  if(!soloObj) pdf.save(`PreReporte_V1_${sucursalActual}.pdf`);
+  return pdf;
+}
+
+async function generarPDF_V2(soloObj=false){
+  const { jsPDF } = window.jspdf;
+  const pdf = new jsPDF("p","pt","a4");
+
+  const logo = await cargarLogoBase64();
+  pdf.addImage(logo, "WEBP", 40, 20, 140, 60);
+  addTitulo(pdf, "PRE-REPORTE – VISITA 2");
+
+  let y = 140;
+  pdf.text(`Sucursal: ${sucursalActual}`, 40, y); y+=20;
+  pdf.text(`Auditor: ${document.getElementById("auditorInput").value}`, 40, y); y+=20;
+  pdf.text(`Fecha: ${document.getElementById("fechaInput").value}`, 40, y); y+=20;
+
+  y+=20;
+  pdf.setFont("Helvetica","bold");
+  pdf.text("Productos revisados:", 40, y);
+  pdf.setFont("Helvetica","normal");
+  y+=20;
+
+  itemsV2.forEach((it,i)=>{
+    y = nuevaPaginaSi(pdf, y);
+    pdf.text(`${i+1}. ${it.codigo} – ${it.descripcion} | Cant V2: ${it.cantidad}`, 40, y);
+    y+=16;
+  });
+
+  if(!soloObj) pdf.save(`PreReporte_V2_${sucursalActual}.pdf`);
+  return pdf;
+}
+
+async function generarPDF_Final(soloObj=false){
+  const { jsPDF } = window.jspdf;
+  const pdf = new jsPDF("p","pt","a4");
+
+  const logo = await cargarLogoBase64();
+  pdf.addImage(logo, "WEBP", 40, 20, 140, 60);
+  addTitulo(pdf, "REPORTE FINAL – AUDITORÍA");
+
+  let y = 140;
+  pdf.text(`Sucursal: ${sucursalActual}`, 40, y); y+=20;
+  pdf.text(`Auditor: ${document.getElementById("auditorInput").value}`, 40, y); y+=20;
+
+  y+=30;
+  pdf.setFont("Helvetica","bold");
+  pdf.text("Diferencias finales:", 40, y);
+  pdf.setFont("Helvetica","normal");
+  y+=20;
+
+  const diffs = calcularDiferenciasFinales();
+  diffs.forEach((d,i)=>{
+    y = nuevaPaginaSi(pdf, y);
+    pdf.text(
+      `${i+1}. ${d.codigo} – ${d.descripcion}
+       V1: ${d.cantidadV1} | Venta: ${d.ventaManual} | Esperado: ${d.esperado}
+       V2: ${d.cantidadV2} | Dif: ${d.diferencia}`,
+      40, y
+    );
+    y += 40;
+  });
+
+  if(!soloObj) pdf.save(`Reporte_Final_${sucursalActual}.pdf`);
+  return pdf;
+}
+/* ============================================================
+   ==========  HISTORIAL DE AUDITORÍAS =========================
+   ============================================================ */
+
+async function cargarHistorial(){
+  const cont = document.getElementById("historialContainer");
+  cont.innerHTML = "<p class='muted'>Cargando...</p>";
+
+  if(!sucursalActual){
+    cont.innerHTML = "";
+    return;
+  }
+
+  const snap = await db.collection("auditorias")
+    .doc(sucursalActual)
+    .collection("registros")
+    .orderBy("createdAt","desc")
+    .limit(20)
+    .get();
+
+  if(snap.empty){
+    cont.innerHTML = "<p class='muted'>No hay auditorías registradas.</p>";
+    return;
+  }
+
+  cont.innerHTML = "";
+
+  snap.forEach(doc=>{
+    const d = doc.data();
+
+    const div = document.createElement("div");
+    div.className = "historialItem";
+
+    const info = document.createElement("div");
+    info.innerHTML = `
+      <strong>${doc.id}</strong><br>
+      <span class="muted">Estado: ${d.estado}</span><br>
+      <span class="muted">Auditor: ${d.visita1?.auditor || ""}</span><br>
+      <span class="muted">Fecha V1: ${d.visita1?.fecha || "-"}</span><br>
+      <span class="muted">Fecha V2: ${d.visita2?.fecha || "-"}</span>
+    `;
+
+    const btns = document.createElement("div");
+    btns.className = "historialBtns";
+
+    // Ver Detalles
+    const b1 = document.createElement("button");
+    b1.className = "small";
+    b1.textContent = "Ver";
+    b1.onclick = ()=>verAuditoriaDetalle(doc.id, d);
+
+    // Descargar PDF Final (si está cerrada)
+    const b2 = document.createElement("button");
+    b2.className = "small";
+    b2.textContent = "PDF";
+    b2.onclick = async()=>{
+      if(d.estado !== "cerrada") return alert("Esta auditoría aún no está cerrada.");
+      const pdf = await generarPDF_Final(false);
+    };
+
+    btns.appendChild(b1);
+    btns.appendChild(b2);
+
+    div.appendChild(info);
+    div.appendChild(btns);
     cont.appendChild(div);
   });
 }
 
 
-/* =====================================================
-   ============ GUARDAR VISITA FIRESTORE ===============
-   ===================================================== */
+/* ============================================================
+   ==========  VER DETALLES EN MODAL SIMPLE ====================
+   ============================================================ */
 
-function dataURLtoBlob(dataurl){
-  const arr=dataurl.split(','), mime=arr[0].match(/:(.*?);/)[1];
-  const bstr=atob(arr[1]); let n=bstr.length;
-  const u8=new Uint8Array(n);
-  while(n--)u8[n]=bstr.charCodeAt(n);
-  return new Blob([u8],{type:mime});
-}
+function verAuditoriaDetalle(id, data){
+  let html = `
+    <h3>Detalles de Auditoría</h3>
+    <p><strong>ID:</strong> ${id}</p>
+    <p><strong>Sucursal:</strong> ${sucursalActual}</p>
+    <p><strong>Auditor:</strong> ${data.visita1?.auditor || "-"}</p>
+    <p><strong>Estado:</strong> ${data.estado}</p>
 
-function genId(suc){
-  const f=new Date();
-  return `AUD-${suc}-${f.getFullYear()}${f.getMonth()+1}${f.getDate()}-${f.getHours()}${f.getMinutes()}${f.getSeconds()}`;
-}
+    <h4>Visita 1:</h4>
+    <p>Fecha: ${data.visita1?.fecha || "-"}</p>
+    <p>Notas: ${data.visita1?.notas || "-"}</p>
+    <p><strong>Productos:</strong></p>
+  `;
 
-document.getElementById("guardarVisita").onclick = async()=>{
-
-  const auditor=document.getElementById("auditor").value.trim();
-  if(!auditor) return alert("Ingresa auditor");
-  if(currentItems.length === 0) return alert("Agrega artículos");
-
-  const suc=document.getElementById("sucursal").value;
-  const id=genId(suc);
-
-  const ref=db.collection("auditorias")
-              .doc(suc)
-              .collection("registros")
-              .doc(id);
-
-  await ref.set({
-    sucursal:suc,
-    auditor,
-    fecha:document.getElementById("fecha").value,
-    notas:document.getElementById("notas").value.trim(),
-    items:currentItems,
-    createdAt:firebase.firestore.FieldValue.serverTimestamp()
-  });
-
-  // fotos
-  for(let i=0;i<currentPhotos.length;i++){
-    const blob=dataURLtoBlob(currentPhotos[i].data);
-    const filePath=`auditorias/${suc}/${id}/photos/${Date.now()}_${i}.jpg`;
-
-    const snap=await storage.ref(filePath).put(blob);
-    const url=await snap.ref.getDownloadURL();
-
-    await ref.collection("photos").add({url, ts:Date.now()});
+  if(data.visita1?.items){
+    html += "<ul>";
+    data.visita1.items.forEach(it=>{
+      html += `<li>${it.codigo} — ${it.descripcion} — Cant: ${it.cantidad}</li>`;
+    });
+    html += "</ul>";
   }
 
-  document.getElementById("resumen").textContent = `Guardado: ${id}`;
-  alert("Auditoría guardada");
-};
+  if(data.visita2){
+    html += `
+      <h4>Visita 2:</h4>
+      <p>Fecha: ${data.visita2.fecha}</p>
+      <p>Notas: ${data.visita2.notas}</p>
+      <p><strong>Productos:</strong></p>
+    `;
+    html += "<ul>";
+    data.visita2.items.forEach(it=>{
+      html += `<li>${it.codigo} — ${it.descripcion} — Cant V2: ${it.cantidad}</li>`;
+    });
+    html += "</ul>";
+  }
 
+  if(data.ventasManual){
+    html += `
+      <h4>Ventas Manuales:</h4>
+      <ul>
+    `;
+    data.ventasManual.items.forEach(v=>{
+      html += `<li>${v.codigo} — ${v.descripcion} — Venta: ${v.venta}</li>`;
+    });
+    html += "</ul>";
+  }
 
-/* =====================================================
-   ============= GENERAR PDF PROFESIONAL ===============
-   ===================================================== */
+  if(data.diferencias){
+    html += `
+      <h4>Diferencias:</h4>
+      <ul>
+    `;
+    data.diferencias.forEach(df=>{
+      html += `<li>${df.codigo} — Dif: ${df.diferencia}</li>`;
+    });
+    html += "</ul>";
+  }
 
-document.getElementById("generarPDF").onclick = ()=>{
-  if(currentItems.length===0 && currentPhotos.length===0)
-    return alert("Nada que exportar");
-
-  const { jsPDF } = window.jspdf;
-  const pdf = new jsPDF("p","pt","a4");
-
-  pdf.setFont("Helvetica");
-  pdf.setFontSize(18);
-  pdf.text("Auditoría de Sucursal",40,50);
-
-  pdf.setFontSize(12);
-  pdf.text(`Sucursal: ${document.getElementById("sucursal").value}`,40,80);
-  pdf.text(`Auditor: ${document.getElementById("auditor").value}`,40,100);
-  pdf.text(`Fecha: ${document.getElementById("fecha").value}`,40,120);
-
-  let y=150;
-  pdf.setFontSize(14);
-  pdf.text("Productos:",40,y); y+=20;
-
-  pdf.setFontSize(11);
-  currentItems.forEach((it,i)=>{
-    pdf.text(`${i+1}. ${it.codigo} – ${it.descripcion}  Cant: ${it.cantidad}`,40,y);
-    y+=14;
-    if(y>740){pdf.addPage();y=40;}
-  });
-
-  if(currentPhotos.length){
-    pdf.addPage();y=40;
-    pdf.setFontSize(14);
-    pdf.text("Fotos:",40,y); y+=20;
-
-    currentPhotos.forEach(p=>{
-      try{
-        pdf.addImage(p.data,"JPEG",40,y,220,150);
-      }catch{}
-      y+=170;
-      if(y>720){pdf.addPage();y=40;}
+  // FOTOS
+  html += `
+    <h4>Fotos V1:</h4>
+    <div style="display:flex;flex-wrap:wrap;gap:6px;">
+  `;
+  if(data.fotosV1){
+    data.fotosV1.forEach(url=>{
+      html += `<img src="${url}" style="width:90px;height:90px;object-fit:cover;border-radius:8px;border:1px solid #bbb">`;
     });
   }
+  html += "</div>";
 
-  pdf.save("auditoria.pdf");
-};
+  html += `
+    <h4>Fotos V2:</h4>
+    <div style="display:flex;flex-wrap:wrap;gap:6px;">
+  `;
+  if(data.fotosV2){
+    data.fotosV2.forEach(url=>{
+      html += `<img src="${url}" style="width:90px;height:90px;object-fit:cover;border-radius:8px;border:1px solid #bbb">`;
+    });
+  }
+  html += "</div>";
+
+  alertifyDetalle(html);
+}
 
 
-/* =====================================================
-   =============== NUEVA VISITA ========================
-   ===================================================== */
+/* ============================================================
+   ==========  ALERT PERSONALIZADO PARA DETALLE ================
+   ============================================================ */
 
-document.getElementById("nuevaVisita").onclick=()=>{
-  currentItems=[];
-  currentPhotos=[];
-  notasEl.value="";
-  document.getElementById("auditor").value="";
-  renderLista();
-  renderPhotos();
-  document.getElementById("resumen").textContent="Lista vacía.";
-};
+function alertifyDetalle(html){
+  const w = window.open("", "_blank", "width=500,height=700,scrollbars=yes");
+  w.document.write(`
+    <html><head>
+    <title>Detalle de Auditoría</title>
+    <style>
+      body{font-family:Poppins,sans-serif;padding:20px;}
+      h3{color:#00416A;margin-top:0;}
+      h4{margin-bottom:5px;}
+    </style>
+    </head><body>${html}</body></html>
+  `);
+}
 
+
+/* ============================================================
+   ==========  LLAMAR HISTORIAL CUANDO CAMBIE SUCURSAL =========
+   ============================================================ */
+
+document.getElementById("sucursalSelect").addEventListener("change", ()=>{
+  setTimeout(cargarHistorial, 500);
+});
+
+setTimeout(cargarHistorial, 1500);
 </script>
 
 </body>
